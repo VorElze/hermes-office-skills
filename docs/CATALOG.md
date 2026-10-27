@@ -1,0 +1,90 @@
+# Skill catalog
+
+- `ai-assistant-editor-setup` — Use when setting up an AI assistant extension in VS Code.
+- `api-and-interface-design` — Guides stable API and interface design. Use when designing APIs, module boundaries, or any public interface. Use when creating REST or GraphQL endpoints, defining type contracts between modules, or establishing boundarie
+- `banner-design` — Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with optional generated or supplied visuals. Actions: design, create, generate banner. Platforms: Facebook,
+- `brainstorming` — You MUST use this before any creative work - creating features, building components, adding functionality, modifying behavior, or planning anything new, in software or out of it (a talk, a business, a renovation).
+- `caveman-explore` — Read-only repository explorer for cold-start orientation, broad cross-file localization, or when a direct search failed. Skip it when the exact file or symbol is already named. Returns path:line citations only; its reads
+- `caveman-review` — >
+- `chat-silence-diagnosis` — Use when the assistant is silent or late on a chat channel.
+- `ci-cd-and-automation` — Automates CI/CD pipeline setup. Use when setting up or modifying build and deployment pipelines. Use when you need to automate quality gates, configure test runners in CI, or establish deployment strategies.
+- `code-audit` — Audit delivered source for security and correctness issues.
+- `codebase-design` — Shared vocabulary for designing deep modules. Use when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-navigable, or when an
+- `codi-team-dispatch` — Use when assigning work to another Hermes profile/worker.
+- `constraint-driven-development` — Establishes a project's quality bar as a written contract and stops agents quietly lowering it. Interviews the user on which dimensions matter, supplies sane default thresholds when they have no number in mind, records e
+- `context-engineering` — Optimizes agent context setup. Use when starting a new session, when agent output quality degrades, when switching between tasks, or when you need to configure rules files and context for a project.
+- `cpanel-shared-hosting-deploy` — Use when deploying a website to shared-hosting cPanel.
+- `cross-profile-cron-ops` — Use when inspecting cron jobs of another Hermes profile.
+- `deprecation-and-migration` — Manages deprecation and migration. Use when removing old systems, APIs, or features. Use when migrating users from one implementation to another. Use when migrating a database schema in production, such as renaming or dr
+- `documentation-and-adrs` — Records decisions and documentation. Use when you need to document an architecture decision (ADR) or the reasoning behind a design choice, when changing public APIs, shipping features, or when you need to record context 
+- `domain-modeling` — Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a GLOSSARY.md, or recording or editing an ADR.
+- `doubt-driven-development` — Subjects every non-trivial decision to a fresh-context adversarial review before it stands. Use when you want every assumption cross-examined before proceeding, when stress-testing a plan for hidden failure modes, when c
+- `finishing-a-development-branch` — Use when implementation is complete, all tests pass, and you need to decide how to integrate the work
+- `frontend-design` — Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults.
+- `git-workflow-and-versioning` — Structures git workflow practices. Use when making any code change. Use when committing, branching, resolving conflicts, splitting uncommitted work in a messy working tree into clean atomic commits, opening or reviewing 
+- `graphic-design-lane` — Use when handling a graphic design task as Reno: asset program, UI mockup, desain visual, atau generate gambar. Prosedur kerja + format deliverable.
+- `hermes-gateway-web-ui` — Use when connecting a web UI to the Hermes gateway.
+- `hermes-profile-hygiene` — Use when cleaning finished Kanban cards and dead jobs.
+- `hermes-profile-provisioning` — Provision Hermes profiles with dev skills, plugins, tools.
+- `hermes-service-persistence` — Use when Hermes services must survive a server reboot.
+- `hermes-stream-stale-diagnosis` — Use when Hermes reports stale provider streams or timeouts.
+- `hermes-team-dashboard` — Use when building a live Hermes worker status panel.
+- `idea-refine` — Refines raw ideas into sharp, actionable concepts through structured divergent and convergent thinking. Use when an idea is still vague, when you need to stress-test assumptions before committing to a plan, or when you w
+- `incremental-implementation` — Delivers changes incrementally in thin, verifiable slices. Use when implementing any feature or change that touches more than one file, or when picking up the next task from a plan. Use when rolling a change out behind a
+- `indonesian-official-letters` — Draft Indonesian official letters (surat dinas) as PDFs.
+- `internal-comms` — A set of resources to help me write all kinds of internal communications, using the formats that my company likes to use. Claude should use this skill whenever asked to write some sort of internal communications (status 
+- `interview-me` — Extracts what the user actually wants instead of what they think they should want. Achieves this through one-question-at-a-time interview until ~95% confidence about the underlying intent. Use when an ask is underspecifi
+- `investigate-first` — Diagnose ambiguous failures before editing. Use for unknown causes, intermittent behavior, performance regressions, or investigations needing evidence-ranked hypotheses.
+- `kanban-rate-limit-resilience` — Use when Kanban tasks run on a request-limited provider API.
+- `karpathy-guidelines` — Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.
+- `large-project-gated-delivery` — Use when coordinating a large multi-milestone gated project.
+- `lean-build` — Build feature work with high overbuilding risk. Use for new behavior, product slices, or integrations where repository reuse, strict scope, and an explicit stop condition matter.
+- `live-agent-office-operations` — Use when debugging live agent office dashboards.
+- `live-react-runtime-qa` — Use when a live React app disagrees with tests.
+- `live-web-release-verification` — Use when verifying a web service before going live publicly.
+- `markdown-pdf-pipeline` — Use when rendering a tutorial or report PDF from Markdown.
+- `marketing-strategy` — Use when planning product positioning, advertising, campaigns, launches, channel mix, or growth strategy.
+- `meta-social-publishing` — Use when automating Threads or Facebook Page posts via API.
+- `meta-threads-oauth-lifecycle` — Use when configuring Meta Threads OAuth and token refresh.
+- `migration` — Implement reversible compatibility-safe transitions. Use for schema, data, API, protocol, configuration, or dependency migrations requiring rollback and preservation proof.
+- `multi-profile-project-orchestration` — Use when coordinating multi-profile project work.
+- `network-operations` — Use when managing office networks, MikroTik/Cisco/Juniper/Aruba config, firewall hardening, traffic monitoring, VPN, or diagnosing connectivity.
+- `observability-and-instrumentation` — Instruments code so production behavior is visible and diagnosable. Use when adding logging, metrics, tracing, or alerting. Use when shipping any feature that runs in production and you need evidence it works. Use when p
+- `office-skill-distribution` — Use when distributing shared skills across Hermes profiles.
+- `organization-site-menu-research` — Assess organization-site navigation labels with evidence.
+- `performance-optimization` — Optimizes application performance across frontend, backend, queries, and databases. Use when performance requirements exist, when you suspect performance regressions, when Core Web Vitals or load times need improvement, 
+- `php-upload-size-limits` — Use when PHP rejects uploads under the stated limit.
+- `planning-and-task-breakdown` — Breaks work into ordered tasks. Use when you have a spec or clear requirements and need to break work into implementable tasks. Use when a task feels too large to start, when you need to estimate scope, or when parallel 
+- `ponytail` — >
+- `ponytail-audit` — >
+- `ponytail-debt` — >
+- `ponytail-review` — >
+- `portable-app-handoff` — Use when publishing an app for reuse on other devices.
+- `receiving-code-review` — Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind 
+- `release-gate-scan` — Verify spec/content deliverables with numeric gates.
+- `request-token-efficiency` — Keep every request lean: scope, format, and stop rules.
+- `sales-analysis-strategy` — Use when analyzing existing sales data, conversion funnels, product mix, pricing signals, or brainstorming honest sales strategies.
+- `scheduled-report-delivery` — Use when a scheduled report must hit its Drive deadline.
+- `screen-recording-qa` — Use when the owner supplies a screen recording of a bug.
+- `security-and-hardening` — Hardens code against vulnerabilities. Use when auditing an input handler for vulnerabilities, when handling user input, authentication, data storage, or external integrations, or when checking a login flow is safe agains
+- `self-hosted-web-service-ops` — Use when operating or diagnosing a self-hosted web service.
+- `server-hygiene-cleanup` — Use when cleaning job residue and config from a server.
+- `service-availability-diagnosis` — Use when a site appears down: prove path vs outage first.
+- `service-credential-onboarding` — Use when saving credentials to log into a website.
+- `shipping-and-launch` — Prepares production launches. Use when preparing to deploy to production, or when asking what needs to be in place before shipping. Use when you need a pre-launch checklist, when setting up monitoring, when planning a st
+- `skill-library-merge-dedupe` — Use when merging two skill libraries for OpenCode.
+- `smarthome-device-integration` — Use when connecting Hermes to smart-home device ecosystems.
+- `social-content-strategy` — Use when planning social media content, calendars, captions, hooks, video scripts, hashtags, or channel adaptation.
+- `source-driven-development` — Grounds every implementation decision in official documentation. Use when you want to verify an approach against the official docs before implementing it, or when you want authoritative, source-cited code free from outda
+- `spec-driven-development` — Creates specs before coding. Use when starting a new project, feature, or significant change and no specification exists yet. Use when drafting a PRD or requirements document with objectives and scope, or when requiremen
+- `sprite-sheet-slicing` — Use when splitting a sprite sheet into individual assets.
+- `state-divergence-diagnosis` — Use when two views of state disagree; trace each pipeline.
+- `task-observer` — Monitors task execution for skill improvement opportunities: logs patterns, user corrections and methodology worth preserving to the workspace, turns them into skill updates in a weekly review, and flags repeating work a
+- `task-progress-reporting` — Report dispatched worker tasks to the user automatically.
+- `team-experience-capture` — Use when a delegated task may yield reusable team learning.
+- `ui-ux-pro-max` — UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, respon
+- `verification-before-completion` — Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions a
+- `webapp-testing` — Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.
+- `writing-plans` — Use when you have a spec or requirements for a multi-step task, before touching code
+
+Held back (not published, see NOTICE.md): `absensi-report`, `code-review`, `diagnosing-bugs`, `doc-coauthoring`, `favicon-gen`, `grilling`, `imagegen`, `prompt-master`, `python-backend-fastapi`, `quick-mockups`, `safe-refactor`, `screenshot-to-code`, `soundhermes`, `surgical-patch`, `task-manager`, `tdd`, `verify-and-stop`, `create-svg-illustrations`

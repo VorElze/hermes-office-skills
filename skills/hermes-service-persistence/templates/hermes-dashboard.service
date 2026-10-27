@@ -1,0 +1,28 @@
+[Unit]
+Description=Hermes Agent Dashboard (Webbase GUI)
+After=network-online.target hermes-gateway.service
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+# Replace <HERMES_BIN> with the hermes launcher, <HERMES_HOME> with the
+# profile home, and <PATHS> with the PATH the launcher needs (node/npm tool
+# dirs + standard system dirs). Copy to ~/.config/systemd/user/ then run:
+#   systemctl --user daemon-reload && systemctl --user enable hermes-dashboard.service
+ExecStart="<HERMES_BIN>" "dashboard" "--no-open"
+WorkingDirectory=<HERMES_HOME>
+Environment="PATH=<PATHS>"
+Environment="HERMES_HOME=<HERMES_HOME>"
+Environment="HERMES_SUPERVISED_CHILD=1"
+Restart=always
+RestartSec=5
+SuccessExitStatus=75
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=70
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

@@ -2,13 +2,13 @@
 name: server-hygiene-cleanup
 description: Use when cleaning job residue and config from a server.
 version: 1.0.0
-author: amanda
+author: koordinator
 license: MIT
 platforms: [linux]
 metadata:
   hermes:
     tags: [cleanup, ops, hygiene, server, maintenance]
-    related_skills: [kanban-rate-limit-resilience, codi-team-dispatch]
+    related_skills: [kanban-rate-limit-resilience, koordinator-team-dispatch]
 ---
 
 # Server hygiene cleanup
@@ -74,7 +74,7 @@ the job runs unattended, so scan them BEFORE touching disk:
    last run was over 24 hours ago is not stale when its next run is in the future.
    Preserve all healthy jobs; do not infer "unused" from age alone.
 5. **Remove fire locks only when proven orphaned** — inventory allowed profiles
-   only; never enter Danu/Raka/Nadia. Remove a lock only if it is a regular,
+   only; never enter SiswaA/SiswaB/SiswaC. Remove a lock only if it is a regular,
    zero-byte file with no process file descriptor open; report removed/remaining
    counts and verify cron jobs remain intact. Never glob-delete locks blindly.
 
@@ -131,6 +131,41 @@ Tiap penghapusan wajib dibuktikan: daftar ulang (cron/job/kartu), `unzip -t` ata
 checksum aset yang dipertahankan, `df -h` / `free -h` sebelum→sesudah. Laporan
 akhir: tabel angka sebelum/sesudah + daftar yang TIDAK disentuh beserta alasannya.
 
+### 5. Decommission proyek permanen ("hapus bersih tanpa sisa")
+
+Urutan wajib: inventarisasi → audit ketergantungan → backup → hapus → verifikasi nihil.
+
+1. **Inventarisasi multi-lokasi (read-only)**: sapuan repo/workspace pakai
+   `search_files(target='files')`; untuk seluruh filesystem pakai `find / -xdev -iname
+   '*<nama>*'` dengan prune `/proc /sys` plus lokasi log sesi/arsip, lalu periksa satu
+   per satu: repo di
+   `~/projects/`, unit systemd system + unit `--user`
+   (`XDG_RUNTIME_DIR=/run/user/0 systemctl --user list-unit-files`), vhost/conf/log
+   Apache, crontab tiap user + `/etc/cron.d`, backup lama, path hard-coded di skrip
+   maintenance (graphify refresh, graph_sync), cron/kanban Hermes, dan SOUL.md profil.
+2. **Audit ketergantungan SEBELUM menghapus**: baca isi tiap unit/vhost — unit yang
+   namanya membawa nama proyek bisa mengerjakan infra BERSAMA (renew cert, deploy,
+   reverse proxy). Putuskan dari `ExecStart`/`ProxyPass`/`Alias`, bukan dari nama.
+   Kalau ternyata dipakai bersama: jangan dihapus — re-home dengan nama netral,
+   `daemon-reload`, enable, jalankan sekali, lalu buktikan lewat dry-run.
+3. **Backup wajib sebelum sentuh**: tar SELURUH repo (termasuk `.git`, `.env`,
+   `node_modules`, artefak tak terpakai) + tar semua file yang akan disentuh,
+   termasuk salinan pre-edit dari config lain yang ikut diedit; `sha256sum >
+   SHA256SUMS`, `chmod 600`, verifikasi `tar -tzf | wc -l` + `sha256sum -c`.
+4. **Hapus + bersihkan konfigurasi aktif**: unit (`disable --now`, file unit, symlink
+   di `timers.target.wants`, stamp di `/var/lib/systemd/timers`), vhost/conf + symlink
+   `sites-enabled`/`conf-enabled` + marker, dan log Apache-nya. Penyebutan proyek di
+   file hidup lain (komentar vhost tetangga, daftar path di skrip, SOUL.md) ikut
+   diperbaiki — lalu `apache2ctl configtest` + `reload`.
+5. **Verifikasi nihil dalam satu blok bukti**: sapuan `find` sisa (harus kosong di
+   luar backup dan rekaman), `systemctl list-units --all` (unit terhapus bisa masih
+   muncul `not-found failed` → `reset-failed`), curl tiap vhost + file tetangga
+   wajib 200, port proyek mati, `df -h` sebelum→sesudah.
+6. **Laporan**: daftar yang dihapus + ukurannya, jalur backup + checksum, dan daftar
+   yang TIDAK disentuh beserta alasannya (aset milik layanan lain yang masih live,
+   rekaman log sesi/kanban/`deliveries.db`, bash history) lengkap dengan tawaran
+   pembersihan lanjutan.
+
 ## Pitfalls
 
 - **Installer sandbox is not filesystem-isolated.** `HERMES_HOME` confines Hermes state only; third-party installers may also write into `~/.claude/plugins/`, `~/.claude-mem/`, `~/.local/bin/`, or mutate `~/.claude/settings.json`. Inventory those paths and any worker/listener before calling a sandbox test clean; see `third-party-tool-adoption-review` for the review workflow.
@@ -140,7 +175,7 @@ akhir: tabel angka sebelum/sesudah + daftar yang TIDAK disentuh beserta alasanny
 - **Proses manual ≠ sampah.** Dashboard/worker yang jalan berjam-jam tapi tidak
   direferensikan config adalah kandidat, TETAP lapis 2 — matikan hanya setelah
   owner bilang tidak dipakai. LSP (tsserver) aktif dipakai worker: jangan disentuh.
-- **Jangan sentuh profil tim skripsi** (Danu/Raka/Nadia) — API terpisah, diatur
+- **Jangan sentuh profil tim skripsi** (SiswaA/SiswaB/SiswaC) — API terpisah, diatur
   manual owner.
 - **Jangan anggap cron lama sebagai cron yatim**: job mingguan normalnya punya
   `last_run_at` lebih dari sehari; cek cadence dan `next_run_at` sebelum menyimpulkan
@@ -197,7 +232,7 @@ akhir: tabel angka sebelum/sesudah + daftar yang TIDAK disentuh beserta alasanny
   confirm spawn+first heartbeat — in ONE pass. The block reason always names
   its owner; if that owner never acted, the block itself is the bug.
 - **`uv cache clean` BISA MENGANTUNG berjam-jam** (bukti 27 Okt: hang sampai
-  timeout 300 dtk), dan `<PATH_ANDA>` bisa berisi **lingkungan MCP yang
+  timeout 300 dtk), dan `~/.cache/uv` bisa berisi **lingkungan MCP yang
   sedang jalan** (chroma-mcp claude-mem memegang `archive-v0/`) — membersihkannya
   = mematikan tool. Jangan pakai perintah `uv cache clean`; kalau tetap mau,
   cek dulu `fuser -v <dir>` lalu `rm -rf <isi>` langsung (cepat, terkontrol).
@@ -221,3 +256,28 @@ akhir: tabel angka sebelum/sesudah + daftar yang TIDAK disentuh beserta alasanny
   hasil parsial** (bukti 27 Okt: `npm cache clean` + `uv` bikin satu blok hang,
   seluruh bukti hilang). Pecah jadi blok kecil, atau jalankan tiap pembersihan
   mandiri agar pengukuran sebelum/sesudah tidak ikut hilang.
+- **Unit systemd yang namanya membawa nama proyek bisa jadi infra bersama**:
+  menghapusnya memutus renew cert/deploy milik situs lain yang tidak ikut proyek.
+  Baca `ExecStart` dulu; kalau ternyata bersama, re-home dengan nama netral dan
+  buktikan timer/service baru jalan (bukan sekadar file-nya ada).
+- **Timer gagal diam-diam karena interpreter hilang**: `ExecStart` sebuah venv
+  menunjuk build python lama yang sudah dihapus → service `failed` tiap kali
+  jadwal, padahal `list-timers` tetap menampilkan nama dan jadwalnya. Deteksi dari
+  `systemctl list-units --all --state=failed` + kegagalan terakhir; perbaikan cepat
+  yang aman: relink `venv/bin/python3` ke build patch-level yang tersedia
+  (site-packages di `lib/python3.x` sama minor = kompatibel), lalu buktikan dengan
+  `--version` + dry-run terhadap layanan targetnya.
+- **Marker apache berpindah, bukan hilang**: `a2disconf` memindahkan marker ke
+  `/var/lib/apache2/conf/disabled_by_admin/`; untuk nol-sisa hapus juga marker itu,
+  lalu `configtest` + `reload` di blok yang sama.
+- **Tool `patch` menolak path sistem di `/etc`** — edit config sistem lewat terminal
+  python dengan `assert pola in teks` sebelum replace; replace tanpa assert menghapus
+  diam-diam kalau pola sudah tidak ketemu (config berubah tanpa perubahan yang dimaksud).
+- **Sapuan `grep -i <kata>` bisa dibajak bridge graph** dan mengembalikan hasil graph
+  alih-alih mengeksekusi perintahnya, sehingga "penghapusan" tidak benar-benar jalan.
+  Wajibkan penanda hasil eksplisit (`echo '--- end ---'` yang harus ikut tercetak) dan
+  filter output dengan python, bukan grep kata tunggal.
+- **"Berhubungan" ≠ "milik proyek"**: aset bersama yang dikonsumsi layanan lain yang
+  masih hidup tidak ikut dihapus; rekaman (log sesi, kanban logs/attachments,
+  `deliveries.db`, `jobs.json.bak`, bash history) bukan instalasi — daftarkan di
+  laporan dan tawarkan, jangan diam-diam dihapus.

@@ -30,7 +30,7 @@ WORK_CMD = f"hermes_cli.main -p {PROFILE}"
 PDIR = f"~/.hermes/profiles/{PROFILE}"
 DB = f"{PDIR}/state.db"
 AUTH = f"{PDIR}/auth.json"
-HERMES = "<HOME_ANDA>/.local/bin/hermes"
+HERMES = "~/.local/bin/hermes"
 
 
 def main():

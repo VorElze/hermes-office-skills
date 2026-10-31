@@ -2,7 +2,7 @@
 name: chat-silence-diagnosis
 description: "Use when the assistant is silent or late on a chat channel."
 version: 1.0.0
-author: codi
+author: koordinator
 license: MIT
 metadata:
   hermes:
@@ -30,7 +30,7 @@ different fixes. A reply that is late is not a reply that was lost.
 
 ### 0. Profile-level silence (worker/clone silent while gateway lives)
 
-When the complaint targets a specific profile ("saya chat codi, dia terdiam")
+When the complaint targets a specific profile ("saya chat koordinator, dia terdiam")
 and NOT the gateway itself, skip straight to proving the profile is alive by
 MESSAGE GROWTH, not by process existence:
 
@@ -148,6 +148,22 @@ that DID get inbound-logged.
 Evidence-first: a compact timeline (inbound vs response-ready timestamps),
 root cause named with its log line quoted, ETA or current state, then remedy
 if any. Separate confirmed facts from hypothesis.
+
+### 7. Laporan terjadwal (cron) tidak sampai ke chat
+
+Laporan periodik yang "jalan" (cron aktif, exit succeeded) belum tentu sampai ke user — lapisan ini
+berbeda dari inbound.
+
+- **Cek target delivery, bukan status job.** Job cron dengan `deliver: origin` tapi tanpa chat target
+  yang tersimpan mencatat delivery `delivered` dengan `content` KOSONG: pesan terkirim tanpa isi.
+  Perbaiki dengan target eksplisit — `hermes cron edit <job-id> --deliver telegram:<chat_id>` — lalu
+  `hermes cron run <job-id>` untuk menguji sekali.
+- **Tabel delivery bukan bukti isi.** Kolom `content` bisa kosong pada SEMUA baris walau pengiriman nyata
+  terjadi, jadi panjang kolom itu tidak boleh dipakai untuk menyimpulkan "tidak terkirim" maupun
+  "terkirim". Receipt yang sah ada di log gateway: cari `message_id` yang dikirim ke chat target.
+  Kalau log tidak punya `message_id` untuk target itu, pengiriman ke user belum terbukti sama sekali.
+- **Konsekuensi laporan:** kalau isi laporan tidak bisa diverifikasi diterima, kirim laporan tahap
+  langsung di chat dan jadikan cron hanya cadangan.
 
 ## Pitfalls
 

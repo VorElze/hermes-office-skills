@@ -32,6 +32,20 @@ SELECT t.short_id, t.status, t.assignee, t.max_runtime_seconds, t.max_retries,
   induk) vs `initial_status` (perlu unblock manual) vs `needs_input` (menunggu
   keputusan coordinator).
 
+### Bandingkan EDGE SET dengan topologi yang dimaksud
+
+Satu kartu root dengan banyak anak = fan-out: begitu root `done`, semua anak terlepas dalam
+siklus yang sama (paralel). Rantai serial = tiap anak punya tepat satu parent = kartu
+sebelumnya.
+
+```sql
+SELECT parent_id, child_id FROM task_links;                              -- bentuk rantai vs bintang
+SELECT child_id, count(*) FROM task_links GROUP BY child_id HAVING count(*)>1;  -- parent ganda
+```
+
+Kartu anak dengan dua parent tetap bisa jalan begitu salah satunya `done` — itu
+paralelisme tersembunyi yang tidak terlihat dari daftar status.
+
 ## 2. Bukti single-flight (4 lapis, semua harus lolos)
 
 1. Edge dependency (di atas).
@@ -60,6 +74,13 @@ Hanya satu sinyal → worker mungkin macet; dua-duanya hilang → boleh reclaim 
 dispatch. Kartu yang sudah `running` dengan worker hidup **tidak boleh**
 di-dispatch manual: itu pekerjaan duplikat yang membakar kuota.
 
+**Jangan jadikan satu sinyal liveness sebagai bukti produktivitas.** Sebelum menyatakan
+worker benar-benar maju, triangulasikan: (1) PID hidup, (2) pesan `state.db` bertambah pada
+run aktif, (3) artefak/workspace berubah sesuai scope, dan (4) smoke/test menghasilkan
+hasil terukur. Status `running`, heartbeat, atau satu HTTP 200 sendirian hanya membuktikan
+aktivitas/liveness parsial — bukan gerbang lulus. Jika tabel pesan tak tersedia, nyatakan
+metrik itu tak terukur dan pakai proses + artefak + tes; jangan menyebutnya bukti pesan.
+
 ## 4. Budget & deadline (board tidak punya kolom due-date)
 
 - Budget per kartu = `max_runtime_seconds` (cap keras, bukan durasi terjadwal).
@@ -80,6 +101,42 @@ di-dispatch manual: itu pekerjaan duplikat yang membakar kuota.
 - Komentar: `SELECT count(*), max(created_at) FROM task_comments WHERE task_id=?;`
 - Target milestone: kartu biasanya menyebut target eksplisit (mis. "11 view
   publik") — hitung artefak nyata terhadap target itu, jangan mengarang persen.
+
+### Jawab pertanyaan “ada progres nyata?”
+
+1. Ambil snapshot segar: waktu lokal, task status, `task_runs` terbaru/outcome/durasi,
+   PID worker dan process age. Jangan daur ulang angka dari laporan sebelumnya.
+2. Triangulasikan empat sinyal terpisah: proses hidup; `state.db` tumbuh selama
+   interval yang diukur; artefak bertambah/berubah sesuai scope (mtime, ukuran,
+   diff); hasil uji yang bisa diulang. Untuk pertumbuhan, ambil count + max
+   timestamp, tunggu interval nyata, ambil ulang — satu sampel tidak membuktikan
+   pertumbuhan. Catat bila tidak sempat mengukur salah satu sinyal.
+3. Validasi klaim angka dari sumber mentah, bukan hanya laporan worker: buka JSON,
+   CSV, log uji atau bukti, hitung ulang denominator, eksklusi, jumlah gagal,
+   dan batas minimum/maksimum. Jangan jumlahkan dataset yang overlap; jelaskan
+   overlap/exclusion eksplisit. Bila laporan menyebut sukses, jalankan minimal
+   satu pemeriksaan independen yang relevan (mis. `php -l`, HTTP smoke, query DB).
+4. Pisahkan dalam jawaban: **progres terverifikasi**, **sedang dikerjakan**,
+   **belum diverifikasi**, dan **hanya status**. Commit dan tes pass membuktikan
+   artefak tertentu, bukan seluruh kartu atau gate. Jangan bilang kartu selesai,
+   gate lulus, atau run ditutup sebelum DB menunjukkan status/outcome final.
+5. Laporkan budget sebagai durasi run dan umur kartu terpisah; sertakan cap dan
+   run yang gagal/terbuang. Jangan sebut “efisien” berdasarkan run terakhir saja
+   bila umur kartu kumulatif sudah melewati cap.
+6. Bila ada isu yang mengancam keamanan (mis. pola kredensial), jangan menebak
+   berdasarkan grep parsial. Identifikasi kecocokan dan konteksnya dengan
+   inspeksi terarah; jangan menyalin rahasia ke laporan/log. Eskalasi hanya
+   temuan yang sungguh sensitif, bukan nama field generik.
+7. Bila bukti belum cukup, katakan tepat apa yang sudah dibuktikan dan apa yang
+   belum, lalu beri langkah verifikasi berikutnya. Jangan mengisi celah dengan
+   klaim seperti “sedang tumbuh” tanpa dua sampel, atau angka kemajuan yang
+   tidak diturunkan dari target terhitung.
+8. Jika laporan berkala menjadi bagian dari deliverable, verifikasi rantai
+   sampai ke chat: target eksplisit, isi laporan yang benar-benar dihasilkan,
+   dan bukti gateway `message_id` untuk tujuan yang dimaksud. Status `succeeded`,
+   entri ledger, atau label `delivered` tanpa body terbaca tidak cukup; bedakan
+   kegagalan eksekusi, isi yang kosong/salah, dan kegagalan transport sebelum
+   menyatakan laporan sampai.
 
 ## 6. Jendela request (berbagi antar profil)
 

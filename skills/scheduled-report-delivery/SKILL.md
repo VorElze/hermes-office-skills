@@ -2,7 +2,7 @@
 name: scheduled-report-delivery
 description: 'Use when a scheduled report must hit its Drive deadline.'
 version: 1.0.0
-author: coordinator
+author: koordinator
 license: MIT
 platforms: [linux]
 metadata:
@@ -22,17 +22,32 @@ job has silently missed a slot and you must diagnose and repair it.
 A recurring export must produce its file AND land it in Google Drive at the
 committed hour. A green `last_status` is not success; the artifact is.
 
-## Recipe files (instance: absensi <nama sekolah>46)
+## Recipe files (instance: absensi SMKN46)
 
 - Drive folder-ID mapping + upload commands:
-  `~/.hermes/profiles/<profile>/skills/absensi-report/gdrive-guide.md`
+  `~/.hermes/profiles/koordinator/skills/absensi-report/gdrive-guide.md`
 - Export-form recipe (radio/PDF state, select values):
-  `~/.hermes/profiles/<profile>/skills/absensi-report/pdf-recipe.md`
-- Downloaded PDFs: `~/.hermes/profiles/<profile>/cache/absensi/`
+  `~/.hermes/profiles/koordinator/skills/absensi-report/pdf-recipe.md`
+- Downloaded PDFs: `~/.hermes/profiles/koordinator/cache/absensi/`
 - Jobs: `hermes cron list | grep -i absen` → daily slots + a guard job that
   verifies delivery after them.
 - Credentials: browser vault, origin-bound — never type, ask for, or print
   a password.
+
+## Auditing a schedule ("is it running on time, on the owner's feed?")
+
+Answer from run history and output files, never from one summary line:
+
+```bash
+hermes cron list                    # schedule, next_run, last run + dispatch timing
+hermes cron runs <job_id> --limit 6 # every attempt with timestamp + source
+hermes cron incidents               # failures with output file paths
+hermes cron doctor                  # config-level health
+# run text per job: search_files(target='files') in <profile>/cron/output/<job_id>/
+```
+
+Then cross-check artifacts: local file presence, `pdfinfo`, and `drive search`
+scoped to the destination parent folder.
 
 ## Procedure
 
@@ -79,6 +94,16 @@ saving a dated copy of `cron/jobs.json` (the file backs up every edit).
 
 ## Pitfalls
 
+- **A watchdog cron that alerts on a healthy state is a spam generator.**
+  Use `no_agent` + script-only mode so the script's stdout is delivered
+  verbatim, print NOTHING when healthy, and keep the script's exit code 0 on
+  every path — a non-zero exit triggers a second, duplicate alert on top of the
+  script's own message. Reserve exit codes for interactive preflight checks
+  (`--preflight`: 0 = ready, non-zero = dead), not for the notifying path.
+- **Health checks must beat the deadline, not report the breach.** A token or
+  credential that expires on a known cycle gets probed at a threshold BELOW the
+  expiry (e.g. age >= 5.5 days for a 7-day expiry) so the owner gets a
+  ready-to-click fix while the pipeline still works.
 - **Hardcoded interpreter paths in runbooks rot** when Hermes rebuilds
   environments → upload fails even though the PDF step succeeded. Auto-detect
   and dry-run the line before the deadline it protects.
@@ -89,6 +114,22 @@ saving a dated copy of `cron/jobs.json` (the file backs up every edit).
   probe with curl's `-w` output or `rc=$?` right after the command.
 - **`last_status: ok` is not delivery proof** — verify the file locally AND
   in Drive before reporting; fabricated success is rejected outright.
+- **The list view shows only the LAST attempt** — a slot that failed and was
+  later rescued by a guard/manual retry reads as plain "ok". Read
+  `hermes cron runs <job_id>` and compare every attempt's timestamp to the
+  scheduled time; `source=builtin` is the scheduler actually firing,
+  `source=direct` is a manual or guard-triggered re-run.
+- **Zero recorded attempts ≠ a broken job.** Compare `Next run` to the
+  current time first: a weekly job created mid-week legitimately has empty
+  history until its first slot arrives. Say "never run yet", not "failed".
+- **Execution completion and owner receipt are separate claims.** A run can
+  reach `completed` while its chat delivery times out; if the owner reports
+  not receiving a report, diff the run's response file in
+  `cron/output/<job_id>/` against what actually landed in the chat.
+- **Guard rescue is the normal recovery path after a source-site outage** —
+  when auditing, follow the chain (scheduled run failed → guard retried →
+  artifacts verified) and report the end state as "recovered, arrived late"
+  rather than either "on time" or "failed".
 - Source-site outage is not yours to fix: DNS alive + TCP timeout means
   the remote side; report it with probes (`getent`, `/dev/tcp`, `curl`) and
   keep the repair ladder armed for when it returns.

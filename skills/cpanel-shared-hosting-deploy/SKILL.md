@@ -2,7 +2,7 @@
 name: cpanel-shared-hosting-deploy
 description: "Use when deploying a website to shared-hosting cPanel."
 version: 1.0.0
-author: amanda
+author: koordinator
 license: MIT
 metadata:
   hermes:
@@ -64,7 +64,7 @@ sertifikat), lihat `references/ssl-acme-verification.md`; jangan menyalin
 private key, repo test, atau external side effect tanpa target dan
 persetujuan yang jelas.
 
-Kasus aktif: site `example.com` di `panel.example.com:2222`.
+Kasus aktif: site `example.com` di `host.example.com:2222`.
 
 ## When to Use
 
@@ -78,7 +78,7 @@ Kasus aktif: site `example.com` di `panel.example.com:2222`.
   iterasi; domain publik baru tersentuh setelah owner approve hasilnya.
   Site setengah jadi tidak boleh ke-publish.
 - **Tunggu bahan/koordinasi yang sedang berjalan sebelum mulai.** Jika owner
-  atau profil lain (Codi/team) sedang menyiapkan referensi atau aset untuk
+  atau profil lain (Koordinator/team) sedang menyiapkan referensi atau aset untuk
   proyek yang sama, jangan mulai scaffold sampai bahannya turun — dua pihak
   mengerjakan scope yang sama = tabrakan hasil.
 - **Kanal update berkala: Git utama, SFTP hotfix kecil, ZIP hanya deploy

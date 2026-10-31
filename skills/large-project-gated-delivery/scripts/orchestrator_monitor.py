@@ -34,8 +34,8 @@ from datetime import datetime, timedelta, timezone
 # ---- sesuaikan ----------------------------------------------------------------
 BOARD = os.environ.get("KANBAN_BOARD", "<board-slug>")
 PROBE_PROFILE = os.environ.get("PROBE_PROFILE", "program-developer")
-PROVIDER_BASE = os.environ.get("PROVIDER_BASE", "https://api.example-proxy.com/v1")
-PROBE_MODEL = os.environ.get("PROBE_MODEL", "claude-<model>")
+PROVIDER_BASE = os.environ.get("PROVIDER_BASE", "https://https://provider.example.com/anthropic")
+PROBE_MODEL = os.environ.get("PROBE_MODEL", "claude-opus-5-5")
 MAX_DISPATCH = int(os.environ.get("MAX_DISPATCH", "1"))
 STALL_MIN = int(os.environ.get("STALL_MIN", "12"))
 PROVIDER_HOLD: tuple[str, ...] = ()          # prefix label, mis. ("W1-01", "W1-02")

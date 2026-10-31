@@ -2,7 +2,7 @@
 name: hermes-team-dashboard
 description: "Use when building a live Hermes worker status panel."
 version: 1.0.0
-author: codi
+author: koordinator
 license: MIT
 platforms: [linux]
 metadata:
@@ -123,7 +123,7 @@ berikan untuk kantor kita"):
   at 0. Activity must come from heartbeats + `sessions.last_activity_at` —
   Chat and cron runs emit no card-status change. If showing chat/session activity too, include it explicitly as a separate source and separate count; never silently include the coordinator's own current conversation in a number labeled as workers working. Treat `sessions.last_activity_at` as a short-lived active-session signal (not proof of task progress) and label it accordingly.
 - **User units have no shell PATH.** Without
-  `Environment=PATH=<HOME_ANDA>/.local/bin:...` in the unit, a
+  `Environment=PATH=~/.local/bin:...` in the unit, a
   `subprocess.run(["hermes", ...])` fails silently and the payload degrades to
   `model: "?"`/`gateway: "unknown"`. Add PATH, then re-check the API JSON.
 - **Bare ES-module specifiers need an import map** (`import ... from 'three'`

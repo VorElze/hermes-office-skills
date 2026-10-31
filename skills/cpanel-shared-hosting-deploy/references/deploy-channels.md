@@ -11,7 +11,7 @@ Peringkat untuk kasus update berkala site kantor:
 **Default**: Git sebagai jalur utama, SFTP untuk hotfix, ZIP hanya saat
 pertama kali atau restore.
 
-## Catatan panel Evolution (akses ke `https://panel.example.com:2222`)
+## Catatan panel Evolution (akses ke `https://host.example.com:2222`)
 
 Fitur yang tersedia dan relevan untuk deploy:
 

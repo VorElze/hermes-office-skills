@@ -44,8 +44,8 @@ hermes profile create <id> --clone --description '<1-2 sentence role>'
 Keep the description free of quotes and apostrophes — it passes through
 nested shells, and one `'` inside aborts the command with `unexpected EOF`.
 
-`--clone` copies codi's `config.yaml` + `.env` + SOUL.md + skills, so the
-hire inherits the working provider (provider proxy anthropic), fallback chain,
+`--clone` copies koordinator's `config.yaml` + `.env` + SOUL.md + skills, so the
+hire inherits the working provider (Provider anthropic), fallback chain,
 credentials, and `agent.max_turns`. Messaging channels are deliberately NOT
 cloned (one bot token cannot be held by two gateways — the CLI refuses
 without `--clone-channels`). Then, in order:
@@ -56,7 +56,7 @@ without `--clone-channels`). Then, in order:
    register, e.g. "Principal … 15+ years"), role boundaries vs other
    profiles, thinking style, deliverable format, handoff path.
 2. **Set model + reasoning:**
-   `hermes -p <id> config set model.default claude-<mid-model>`,
+   `hermes -p <id> config set model.default claude-sonnet-5`,
    `hermes -p <id> config set model.provider anthropic`,
    `hermes -p <id> config set agent.reasoning_effort high`.
    The reasoning set prints `not a recognized config key … did you mean
@@ -74,7 +74,7 @@ without `--clone-channels`). Then, in order:
    sessions for a new profile. One-shot stdout often omits the reply.
    Also re-check `hermes profile list` shows the model.
 4. Profile **id** must be lowercase alphanumeric; a friendly display name
-   (`Harry`) rides on the id (`harry`) — do not try to make the id mixed-case.
+   (`Planner`) rides on the id (`planner`) — do not try to make the id mixed-case.
    To set/change a display name on an existing profile (presentation-only —
    the id, alias, Kanban assignee, and paths stay untouched), there is no CLI
    verb; call the API from the Hermes source tree:
@@ -112,6 +112,18 @@ code-review/diagnosis skills. A skill list already containing a near-duplicate
 install anything.
 
 ### 2. System packages (apt / pip / npm)
+
+Use the interpreter belonging to the target environment when installing Python packages; a successful install into one Python does not make the package available to another. For a Hermes-managed venv, if its pip module is unavailable or fails, use the bundled `uv` explicitly against that interpreter, then verify import and the module CLI:
+
+```bash
+UV=~/.hermes/tools/uv-0.13.5-linux-x64/uv
+PY=/path/to/target/venv/bin/python3
+"$UV" pip install --python "$PY" 'playwright==1.63.0'
+"$PY" -c 'import playwright; print(playwright.__file__)'
+"$PY" -m playwright --version
+```
+
+Do not treat this example version/path as universal; resolve the target interpreter and available bundled uv for the current install. Keep Python package verification separate from the Node-based `playwright-cli` probe.
 
 ```bash
 apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -190,7 +202,7 @@ or overwriting silently:
 ### 3b. Fleet-wide skill version sync (update an existing skill across already-hired workers)
 
 When the canonical copy of a skill (usually the coordinator's own profile, e.g.
-`amanda`) is newer or carries more content than what already-hired workers hold —
+`koordinator`) is newer or carries more content than what already-hired workers hold —
 e.g. after the coordinator iterated on a SKILL.md directly — propagate it to every
 worker profile in one pass:
 
@@ -222,7 +234,7 @@ A plugin that must behave identically across the fleet needs a single source dir
 copy step, because a profile's plugin directory is a separate copy, not a link:
 
 ```bash
-SRC="<HOME_ANDA>/.tools/<plugin>"                 # canonical source
+SRC="~/.tools/<plugin>"                 # canonical source
 for t in ~/.hermes/plugins/<plugin> ~/.hermes/profiles/*/plugins/<plugin>; do
   [ -d "$t" ] || continue
   for f in __init__.py graph_query.py plugin.yaml; do
@@ -305,6 +317,8 @@ full error, don't re-run blindly.
 
 ### 5. Final verification report
 
+When auditing a fleet, derive the roster from `hermes profile list`; do not equate every directory under `profiles/` with a real profile. Classify a directory as a skill only when it contains a `SKILL.md` (category folders are not malformed skills). Capture long audit output to a file and read that file in bounded sections; a truncated or one-line tool result is not evidence of a clean audit. Verify each profile's tools and plugins using profile-scoped commands, and test independent runtimes independently (for Playwright, CLI open/eval/close and Python import/version plus a real headless browser navigation).
+
 Re-run step 1's inventory and report only what the re-run printed: skill
 names + `enabled`, plugin names + `enabled`, package probes with their real output. Anything unverified or failed is
 reported as not done, with the exact blocker — partial completion stated
@@ -327,6 +341,7 @@ scripts: they overwrite the GLOBAL key in the top-level Hermes home (destroying
 every profile's rotation, including the coordinator's, which owners mark
 "JANGAN DISENTOH"), and their bundled Claude settings JSON is malformed anyway.
 
+1. Extract the key from the delivered file (match `PROVIDER_KEY="([^"]+)"`);
    register which profile ID maps to which key/group before touching anything,
    and confirm each target profile has no active run (`hermes kanban list` by
    assignee) — a running worker rewrites its own `auth.json`.
@@ -383,6 +398,7 @@ in stdout with exit code 0. Always verify by listing skills afterward;
   Read the file first (indentation differs from the docs' example — a
   guessed `enabled:` block writes nothing or corrupts plugin config). Prefer
   `hermes -p <profile> config get plugins.enabled` to see the current shape.
+- **Don't trust a CLI version probe as proof that the Python API works (or vice versa).** Test the actual target interpreter with `python -c 'import playwright'` and `python -m playwright --version`, then separately smoke-test `playwright-cli` by opening a page, evaluating a value, and closing the session; these are independent runtimes and may be installed or configured differently.
 - **Don't trust `--version` of a Python-installed CLI on PATH.** Playwright
   installs as a Python module: probe `python3 -m playwright --version`, not
   `playwright --version`.

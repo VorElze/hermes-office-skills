@@ -20,7 +20,7 @@ import subprocess
 import sys
 import tempfile
 
-DEFAULT_VAULT_HANDLE = "vault_<handle>"  # entri vault cPanel <proyek> (isi handle milikmu)
+DEFAULT_VAULT_HANDLE = "vault_<handle>"  # entri cPanel example (ganti bila perlu)
 
 
 def _load_vault_store():
@@ -101,8 +101,8 @@ def run_ssh(host: str, user: str, command: str, handle: str, port: int = 22, tim
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("command", help="perintah yang dijalankan di host remote")
-    ap.add_argument("--host", default="panel.example.com")
-    ap.add_argument("--user", default="<proyek>660")
+    ap.add_argument("--host", default="host.example.com")
+    ap.add_argument("--user", default="cpuser")
     ap.add_argument("--port", type=int, default=22)
     ap.add_argument("--handle", default=DEFAULT_VAULT_HANDLE)
     args = ap.parse_args()

@@ -2,7 +2,7 @@
 name: release-gate-scan
 version: 1.0.0
 description: Verify spec/content deliverables with numeric gates.
-author: office
+author: Planner (program-planner)
 license: MIT
 platforms: [linux]
 metadata:
@@ -13,7 +13,7 @@ metadata:
 
 # Release Gate Scan
 
-Distilled from <PROYEK> M1 (Oct 2026), where the coordinator needed proof, not prose: every "complete" claim had to survive one numeric scan before the card could close.
+Distilled from ContohProyek M1 (Oct 2026), where the coordinator needed proof, not prose: every "complete" claim had to survive one numeric scan before the card could close.
 
 ## When to Use
 

@@ -2,7 +2,7 @@
 name: kanban-rate-limit-resilience
 description: "Use when Kanban tasks run on a request-limited provider API."
 version: 1.0.0
-author: office
+author: koordinator
 license: MIT
 metadata:
   hermes:
@@ -18,7 +18,7 @@ does not lose progress, and teach the operator how to read what happened.
 ## When to Use
 
 - A Kanban board runs workers against a provider API with a hard request
-  window (e.g. a proxy like example-proxy.com at 550 req/5h).
+  window (e.g. a proxy like provider.example.com at 550 req/5h).
 - The user asks what happens when the request limit runs out mid-task, or
   how to keep progress across quota windows.
 - A card shows `rate_limited`, `gave_up`, `respawn_guarded`, or `blocked`
@@ -131,7 +131,7 @@ hermes kanban dispatch --dry-run      # 'Guarded (<reason>): <id>' per held card
 | `dependency_wait` | child waiting on parent `done` | expected, not stuck |
 
 A card showing only `created` + `dependency_wait` is **not** stuck.
-**`api_max_retries` default template = 1 di semua profile selain codi** (baris `3` ter-comment) → worker cuma 1 attempt ("every one of 1 attempts"), tak sempat rotate key → tiap run mati exit 75 dalam ~60 detik (9× berturut 20:23–21:13, 2026-10-05). Fix terbukti: `hermes -p <p> config set agent.api_max_retries 3` + `fallback.min_switch_reset_seconds 0` → run berikutnya langsung `running` + heartbeats lanjut. **Saat onboard profile baru / "quota wall" berulang: cek kedua knob ini dulu, jangan hanya reset bench.**
+**`api_max_retries` default template = 1 di semua profile selain koordinator** (baris `3` ter-comment) → worker cuma 1 attempt ("every one of 1 attempts"), tak sempat rotate key → tiap run mati exit 75 dalam ~60 detik (9× berturut 20:23–21:13, 2026-10-05). Fix terbukti: `hermes -p <p> config set agent.api_max_retries 3` + `fallback.min_switch_reset_seconds 0` → run berikutnya langsung `running` + heartbeats lanjut. **Saat onboard profile baru / "quota wall" berulang: cek kedua knob ini dulu, jangan hanya reset bench.**
 
 Quiet `watch` output for <60s is normal — dispatcher ticks every 60s.
 
@@ -305,7 +305,7 @@ Quiet `watch` output for <60s is normal — dispatcher ticks every 60s.
   cascade useless errors whenever the primary hiccups: `hermes fallback list`
   per profile; drop dead entries (`hermes config unset fallback_providers` when
   the whole chain is dead — `hermes fallback remove` needs a TTY).
-- **Incident 18 Okt (`6 consecutive stale attempts`, codi + netops + social-media):**
+- **Incident 18 Okt (`6 consecutive stale attempts`, koordinator + netops + social-media):**
   gejala = turn abort non-retryable setelah 6 stale berturut, padahal probe stream
   sehat (TTFB ~3s). Provider hang INTERMITEN, bukan mati total. Fix 2 sisi:
   (a) `providers.anthropic.stale_timeout_seconds` 120→60 di SEMUA profil + default
@@ -324,10 +324,10 @@ Quiet `watch` output for <60s is normal — dispatcher ticks every 60s.
   failure (Lihat `error_classifier.py` — IndexError tidak ada di list `Transient/Streaming`)
   sehingga `_maybe_disable_streaming` tidak menyalakan fallback → 3 retry terbuang tiap tick.
   Akar: SDK anthropic 0.87.0 `accumulate_event` (`lib/streaming/_messages.py:471`) meng-index
-  event SSE invalid dari proxy LLM. **Fix terbukti: `model.streaming: false` di
+  event SSE invalid dari proxy provider. **Fix terbukti: `model.streaming: false` di
   config.yaml SEMUA profil** (dibaca di `agent_init.py:1241`). Bukti terukur: IndexError
   berhenti total setelah 22:28 (terakhir 22:16), waste request 23%→14%, monitor cron
-  kembali sukses. Proyek `model.streaming:false` sudah ada di amanda/codi/program-developer/
+  kembali sukses. Proyek `model.streaming:false` sudah ada di koordinator/koordinator/program-developer/
   code-analyst per 22:28. Jangan upgrade paksa anthropic (pyproject pin 0.87.0 utk CVE-
   2026-34450/34452) — matikan streaming saja.
 - **`_maybe_disable_streaming` ada (`agent/chat_completion_helpers.py:3573`) tapi tidak
@@ -336,7 +336,7 @@ Quiet `watch` output for <60s is normal — dispatcher ticks every 60s.
   Deteksi cepat: `grep "list index out of range" <profile>/logs/agent.log | tail -5`.
 - **Monitor cron pakai digest output; counter detik mentah (`umur_pesan=…s`) membuat
   hash berubah tiap tick → LLM run penuh tiap 15 menit walau tidak ada perubahan nyata**
-  (pemborosan). Fix: `<proyek>_monitor.py` → digest dari nilai ter-bucket
+  (pemborosan). Fix: `example_monitor.py` → digest dari nilai ter-bucket
   (msg/cmt = ok/stale di ambang 600s, elapsed // 15 menit, pct // 10). Terverifikasi:
   run ke-2 & ke-3 `NOCHANGE` (sebelumnya selalu CHANGED). Pola ini berlaku untuk monitor
   lain — pastikan payload yang di-hash deterministik.

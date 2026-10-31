@@ -1,7 +1,7 @@
 # Akses shell hosting & linking Git hosting ↔ GitHub
 
 Catatan teknis untuk shared hosting cPanel yang dipakai site kantor
-(panel `https://panel.example.com:2222`, user cPanel `<proyek>660`).
+(panel `https://host.example.com:2222`, user cPanel `cpuser`).
 
 ## Dua port, dua protocol berbeda
 
@@ -16,7 +16,7 @@ web. Jangan tertukar mana yang SSH.
 ## Username shell = username cPanel
 
 Untuk shared hosting, user shell biasanya sama dengan username cPanel
-(`<proyek>660`). Login memakai password auth yang sama dengan entri vault
+(`cpuser`). Login memakai password auth yang sama dengan entri vault
 panel — jadi satu entri vault cukup untuk dua jalur.
 
 ## Menu panel yang sudah diverifikasi ada

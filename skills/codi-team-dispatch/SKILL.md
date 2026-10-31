@@ -1,8 +1,8 @@
 ---
-name: codi-team-dispatch
+name: koordinator-team-dispatch
 description: 'Use when assigning work to another Hermes profile/worker.'
 version: 1.1.0
-author: codi
+author: koordinator
 license: MIT
 platforms: [linux]
 metadata:
@@ -10,16 +10,16 @@ metadata:
     tags: [kanban, delegation, orchestration, profiles, token-efficiency]
 ---
 
-# Team dispatch protocol
+# Koordinator Team Dispatch
 
 ## When to Use
 
 Use this whenever the user asks to *assign, schedule, delegate, or command*
-work to a profile other than the coordinator (developer, analyst) — or asks
+work to a profile other than koordinator (program-developer, code-analyst) — or asks
 what other workers exist.
 
-User's convention: route ALL work assignments through the coordinator first. The user
-speaks casual Indonesian; codi translates each request into a precise task
+User's convention: route ALL work assignments through koordinator first. The user
+speaks casual Indonesian; koordinator translates each request into a precise task
 spec aimed at the target worker's own persona.
 
 ## Worker roster (verify with `hermes profile list` before assigning)
@@ -29,22 +29,22 @@ IDs/aliases stay canonical. The user refers to workers by display name.
 
 | Profile ID | Display name | Persona (from `hermes profile describe <name>`) | Model / effort | Use for |
 |---|---|---|---|---|
-| `<developer-id>` | **Developer** | Senior SWE, owns the final result | top model / high | implementationation, builds, fixes |
-| `<analyst-id>` | **Analyst** | Code analyst / AppSec reviewer, skeptical+constructive | top model / highest effort | review | review, security, audit |
-| `<planner-id>` | **Planner** | Program planner, brainstorm→spec | mid model / high | specs, scoping, brainstorming (proxy-only) |
-| `<marketing-id>` | **Marketer** | Marketing & advertising strategist | mid model / high | positioning, ads, campaigns, growth strategy |
-| `<social-id>` | **Social** | Social media & content specialist | mid model / medium | content calendars, captions, hooks, scripts |
-| `<sales-id>` | **Sales analyst** | Sales analyst & strategist | mid model / high | sales data analysis, honest strategy review |
-| `skripsi-writer` | **Danu** | Senior Thesis Writer & Academic Editor, 18+ yrs | <top-model>|<mid-model> / high | drafting, struktur bab, bahasa, revisi skripsi |
-| `skripsi-writer2` | **Raka** | Senior Thesis Writer & Academic Editor, 18+ yrs (clone Danu) | <top-model>|<mid-model> / high | lane sama dgn Danu — pemecah antrean/bagi bab |
-| `skripsi-research` | **Nadia** | Senior Research Methodologist, 18+ yrs | <top-model>|<mid-model> / high | metodologi, sampling, analisis data, kajian pustaka |
-| `netops` | **Rick** | Senior NOC/Network Engineer, 20+ yrs (MikroTik/Cisco/Aruba/Juniper/Linux) | <top-model>|<mid-model> / high | jaringan kantor: hardening router, firewall, monitoring, QoS |
-| `graphic-designer` | **Reno** | Visual designer — layout, poster, brand assets | <top-model>|<mid-model> / medium | poster, design, visual assets |
-| `amanda` | **Amanda** | Orchestrator profile — delegates work across the fleet | <top-model>|<mid-model> / medium | coordination, multi-profile dispatch (use her as orchestrator, not as a worker) |
+| `program-developer` | **Developer** | Principal SWE, 15+ yrs, owns the final result | opus-5-5 / high | implementation, builds, fixes |
+| `code-analyst` | **Analyst** | Principal code analyst / AppSec reviewer, skeptical+constructive | opus-5-5 / ultra | review, security, audit |
+| `planner` | **Planner** | Principal Program Planner, 15+ yrs, brainstorm→spec | sonnet-5 / high | specs, scoping, brainstorming (Provider-only) |
+| `marketing` | **Rendra** | Principal Marketing & Advertising Expert, 20+ yrs | sonnet-5 / high | positioning, ads, campaigns, growth strategy |
+| `social-media` | **Laras** | Social Media Professional & Marketing Specialist, 20+ yrs | sonnet-5 / medium | content calendars, captions, hooks, scripts |
+| `sales-analyst` | **Bima** | Senior Sales Analyst & Strategist, 20+ yrs, brutally honest | sonnet-5 / high | sales data analysis, honest strategy review |
+| `skripsi-writer` | **SiswaA** | Senior Thesis Writer & Academic Editor, 18+ yrs | sonnet-5 / high | drafting, struktur bab, bahasa, revisi skripsi |
+| `skripsi-writer2` | **SiswaB** | Senior Thesis Writer & Academic Editor, 18+ yrs (clone SiswaA) | sonnet-5 / high | lane sama dgn SiswaA — pemecah antrean/bagi bab |
+| `skripsi-research` | **SiswaC** | Senior Research Methodologist, 18+ yrs | opus-5-5 / high | metodologi, sampling, analisis data, kajian pustaka |
+| `netops` | **Rick** | Senior NOC/Network Engineer, 20+ yrs (MikroTik/Cisco/Aruba/Juniper/Linux) | sonnet-5 / high | jaringan kantor: hardening router, firewall, monitoring, QoS |
+| `graphic-designer` | **Reno** | Visual designer — layout, poster, brand assets | opus-5-5 / medium | poster, design, visual assets |
+| `koordinator` | **Koordinator** | Orchestrator profile — delegates work across the fleet | sonnet-5 / medium | coordination, multi-profile dispatch (use her as orchestrator, not as a worker) |
 | `default` | — | base profile; runs the gateway multiplexer | — | never assign work; do not delete |
-| `codi` | **Codi** | primary assistant, Telegram-facing | <top-model>|<mid-model> / medium | orchestration only, not card execution |
+| `koordinator` | **Koordinator** | primary assistant, Telegram-facing | sonnet-5 / medium | orchestration only, not card execution |
 
-Marketing team lane rules: marketer=strategi & iklan, social=konten & channel, sales=data penjualan & review jujur. Mereka menyerahkan lintas-lane lewat Codi (tidak ada chat langsung antar profile).
+Marketing team lane rules: Rendra=strategi & iklan, Laras=konten & channel, Bima=data penjualan & review jujur. Mereka menyerahkan lintas-lane lewat Koordinator (tidak ada chat langsung antar profile).
 
 ## Standing delegation behavior
 
@@ -53,7 +53,7 @@ When the user asks me to handle work suitable for another profile, I may delegat
 ## Channels
 
 - **One-off work** → kanban card: `kanban_create(title, assignee=<profile>, body=<spec>)`.
-  Use the project’s existing board when one is active; `<default-board>` is the
+  Use the project’s existing board when one is active; `autoclipper` is the
   default only when no project board applies. Durable; auto-requeues on rate
   limit. Route implementation to its specialist worker instead of silently
   doing it yourself when the user asks for delegation or worker-specific keys,
@@ -63,7 +63,7 @@ When the user asks me to handle work suitable for another profile, I may delegat
   independent verification, and final report—not competing edits in the same
   workspace.
 - **Recurring work** → `hermes -p <profile> cron create '<schedule>' '<prompt>'`
-  so the job runs under that profile's home, not codi's.
+  so the job runs under that profile's home, not koordinator's.
 - **No direct chat between profiles** — coordination happens only via card
   body, comments, and completion summaries.
 
@@ -78,7 +78,7 @@ When the user asks me to handle work suitable for another profile, I may delegat
    a rate-limit requeue never loses progress (user-approved requirement).
 6. When the task is diagnostic: require the worker to PROVE root cause with
    a measurement (hash/number) in a comment BEFORE the first code edit.
-   This found 4/4 real bugs in proyek; guess-first produced misses.
+   This found 4/4 real bugs in AutoClipper; guess-first produced misses.
 7. State the measurement window for any before/after number (extract vs
    full span) — mismatches there overstated benefit ~3× in review.
 
@@ -95,7 +95,7 @@ When the user asks me to handle work suitable for another profile, I may delegat
   py3.10 venvs).
 - **`agent.max_turns` ≠ provider quota.** Iteration-exhaustion timeouts
   (exit with 'Iteration budget exhausted (N/N)') come from the profile's
-  `agent.max_turns` (raised 150→500 fleet-wide), not provider proxy limits.
+  `agent.max_turns` (raised 150→500 fleet-wide), not Provider limits.
 - **Failure vocabulary:** exit 75 = rate limit → auto-requeue, no failure
   counted, no action needed; exit 78 (401/403/404) = sticky block → fix
   credential then `hermes kanban unblock <id>`.
@@ -115,7 +115,7 @@ When the user asks me to handle work suitable for another profile, I may delegat
 - **Cron CLI gotchas (hermes cron create, terbukti 20 Okt 2026):** (1) `--script` WAJIB path RELATIF ke `~/.hermes/profiles/<profil>/scripts/` — path absolut ditolak ("must be relative to..."), jadi file monitor harus disalin ke folder itu lalu dipanggil pake nama file saja. (2) `--repeat N` = total maksimum run; saat habis, job HILANG dari `hermes cron list` tanpa jejak → perpanjang `--repeat` SEBELUM habis (saya hampir kehilangan anti-macet karena repeat 12 habis). Verifikasi tiap sesi: `hermes cron list | grep <nama>`. (3) Deadline slip saat worker PRODUKTIF (activity <10 mnt) tapi lewat budget → JANGAN reclaim; perpanjang deadline lewat komentar kartu + update konstanta `DEADLINE_EPOCH` di monitor script, tulis alasannya. Reclaim hanya untuk worker tanpa output. (4) `hermes cron runs <name>` bisa kosong walau job jalan (atribut run tak selalu tercatat) — jangan pakai itu sebagai bukti hidup; pakai `hermes cron list` + `Last run`.
 - **Format laporan progres (preferensi pemilik, 6 Okt 2026 — WAJIB):** semua
   laporan rutin ke pemilik memakai format berikut (pemilik suka; sudah
-  disampaikan ke Codi 2026-10-06, dia simpan juga):
+  disampaikan ke Koordinator 2026-10-06, dia simpan juga):
   1. Jam + judul laporan.
   2. Status per kartu/tugas: ID + nama + status (DONE/RUNNING/BLOCKED/TODO)
      + persentase perkiraan.
@@ -127,9 +127,9 @@ When the user asks me to handle work suitable for another profile, I may delegat
   5. "Tanpa perubahan" bila nihil.
   Kirim tiap ~15 menit selama pekerjaan aktif; stop + laporan final saat semua
   selesai.
-- **Reasoning effort by role:** audit tertinggi untuk verifikator, eksekusi tinggi
-  untuk produsen, planner tinggi, koordinator medium — sesuaikan dengan biaya salah.
-- **Gerbang independen menangkap klaim optimis** (5 dari 6 milestone proyek
+- **Reasoning effort by role (current):** Analyst `ultra` (audit depth),
+  Developer `high` (execution), Planner `high`, Koordinator `medium`.
+- **Gerbang independen menangkap klaim optimis** (5 dari 6 milestone AutoClipper
   REVISE di putaran 1) — jangan pangkas verifikasi demi kecepatan. Detail ada di
   skill `large-project-gated-delivery`.
 - **Kartu `needs_input` = kebijakan, bukan error.** Putuskan di komentar dengan format:
@@ -145,11 +145,11 @@ When the user asks me to handle work suitable for another profile, I may delegat
   tautan lokal yang tidak bisa diunduh penerima. Jika hasil riset punya banyak
   file pendukung, buat ZIP terverifikasi, kirim ZIP sebagai lampiran, dan
   sertakan ringkasan singkat serta isi ZIP.
-- **Buat kartu berantai = RECLAIM dulu, baru link (proyek berantai 7 Okt 2026):**
+- **Buat kartu berantai = RECLAIM dulu, baru link (eVoting 7 Okt 2026):**
   dispatcher melepas 5 kartu serentak begitu dibuat karena `link` belum sempat
   dipasang (semua start di detik yang sama). Urutan aman: `create` semua →
   `reclaim` anak-anak yang lari → `link` → verifikasi edge di `task_links` DB
-  papan (`sqlite3 ~/.hermes/kanban/boards/<default-board>/kanban.db`) — jangan
+  papan (`sqlite3 ~/.hermes/kanban/boards/autoclipper/kanban.db`) — jangan
   percaya output CLI link tanpa cek DB.
 - **Seed papan dari manifest (terbukti 23 Okt 2026):** `kanban boards create <slug> --name … --default-workdir <repo> --switch`; body multi-baris lewat `create <title> --body-file <path> --json` (`comment` tak punya `--body-file`, tapi `create` punya) dan ambil `id` dari JSON itu; `--parent` boleh berulang saat create; `complete` menolak tanpa bukti → `complete <id> --force --result "…"`; `block` alasannya POSISIONAL (`block <id> --kind capability "…"`), dan `--kind dependency` auto-release begitu semua parent `done`. Seed wajib idempoten: baca `kanban list --json` dan lewati judul yang sudah ada, karena skrip seed yang diulang menggandakan kartu.
 - **Anti-loop: `running` ≠ produktif.** Ukur output nyata, bukan status: worker
@@ -157,7 +157,7 @@ When the user asks me to handle work suitable for another profile, I may delegat
   maks macet-tanpa-output 10 menit) = kerja tanpa hasil. Sinyal aktivitas = TIGA
   lapis gabungan, JANGAN file saja: (a) file workspace, (b) komentar kartu,
   (c) pesan runtime `<profil>/state.db`. File-saja = FALSE POSITIVE untuk worker
-  yang bekerja via browser/API (pekerja via curl/screenshot pernah dikira macet 30 menit padahal jalan).
+  yang bekerja via browser/API (12-Okt: Planner lewat curl/screenshot dikira MACET 30m).
   Cron monitor juga wajib membawa sinyal macet ini di snapshot. Ladder: (1) steering
   comment minta eksekusi + milestone berbukti dalam 15m; (2) ulang → reclaim + dispatch.
   Kartu `done` yang senyap NORMAL—bedakan macet dari tuntas.
@@ -172,12 +172,21 @@ When the user asks me to handle work suitable for another profile, I may delegat
   "semua done" membuat laporan 15-menit berhenti padahal 1 kartu masih jalan.
   Cron juga wajib memuat deteksi anti-loop (buta data di workspace) seperti
   ladder di atas, bukan cuma snapshot status.
+- **`hermes kanban create --json` bisa tertelan output terdemote:** exit 0 tapi `id`
+  tidak terbaca (output panjang dipotong). Jangan menebak atau membuat kartu ulang —
+  ambil ID dengan `hermes kanban --board <b> list --json` lalu parse mulai karakter
+  `{` pertama, atau `list | grep -E '<kode-kartu> '`. Tanpa ID, `link`/`dispatch`
+  berikutnya salah sasaran dan kartu yatim menggantung.
+- **Menambah kartu di tengah sprint wajib memperluas driver + skrip laporan**
+  (`CARDS`/urutan, bobot, `TOTAL_W`) SEBELUM `dispatch`. Kalau tidak, progres
+  berhenti di bobot lama dan kartu baru tidak pernah dibuka maupun dilaporkan —
+  terlihat seperti proyek selesai padahal masih ada fase.
 - **Proses yatim bekas run:** sisa `php -S` / server uji dari run kartu lama
-  (mis. verifikator, port terbuka tapi kartu sudah todo) → kill, port dicek bersih;
+  (mis. Analyst, port terbuka tapi kartu sudah todo) → kill, port dicek bersih;
   jangan biarkan menumpuk antar run.
 
 - **Cron laporan yang hanya MELAPOR tidak memperbaiki (terbukti 8 Okt):**
-  `h3d_status_report.py` mencetak `ALERT ... -> Amanda: reclaim+dispatch`
+  `h3d_status_report.py` mencetak `ALERT ... -> Koordinator: reclaim+dispatch`
   tapi tidak pernah mengeksekusi → kartu macet selama berjam-jam sementara
   laporan tetap keluar tiap 15 menit (owner melihat "stuck" padahal monitor
   aktif). Pasang cron `--no-agent` TERPISAH yang mengeksekusi ladder
@@ -186,7 +195,7 @@ When the user asks me to handle work suitable for another profile, I may delegat
   Sekunder: kartu auto-release dari `needs_input` berstatus `todo`, dan
   dispatcher hanya claim `ready` → kartu menganggur tanpa `promote`;
   promote gagal bila induknya belum done (itu normal, dependency_wait).
-- **Kartu `--initial-status blocked` + `hermes kanban link` TIDAK auto-unblock** saat parent `done` — blokirnya berlabel `reason: initial_status` (manual), bukan `dependency_wait`. Tercoba 2× (review verifikator): parent selesai tapi child tetap `blocked` sampai koordinator unblock manual → jeda 30-90 menit sunyi yang terlihat seperti "proyek berhenti". Rantai benar: (a) tanpa initial-block / pakai `dependency_wait`, (b) buat child begitu parent `done`, atau (c) monitor auto-unblock. **Selalu cek `hermes kanban show <child>` tepat setelah parent `done` — jangan berasumsi gerbang terbuka.**
+- **Kartu `--initial-status blocked` + `hermes kanban link` TIDAK auto-unblock** saat parent `done` — blokirnya berlabel `reason: initial_status` (manual), bukan `dependency_wait`. Tercoba 2× (review Analyst & F4): parent selesai tapi child tetap `blocked` sampai koordinator unblock manual → jeda 30-90 menit sunyi yang terlihat seperti "proyek berhenti". Rantai benar: (a) tanpa initial-block / pakai `dependency_wait`, (b) buat child begitu parent `done`, atau (c) monitor auto-unblock. **Selalu cek `hermes kanban show <child>` tepat setelah parent `done` — jangan berasumsi gerbang terbuka.**
 - **Kanban command gotchas (terbukti 13 Okt, VO2D R5):** `hermes kanban done <id>` TIDAK ADA → pakai `hermes kanban complete <id>`; `comment --body-file` TIDAK didukung → `comment <id> "$(cat file)"`; `tasks.worker_started_at` = UUID BUKAN timestamp (pembacaan kolom itu sebagai waktu menghasilkan elapsed nonsense — kartu segar terbaca 30 jam over budget); `task_runs.started_at` bisa ISO-8601 sementara `task_comments.created_at` epoch detik dan `state.db messages.timestamp` bisa detik ATAU milidetik di tabel yang sama. Route SEMUA komputasi umur lewat satu `to_epoch()` yang menangani ketiga bentuk + deteksi satuan (`t/1000 if t > 1e12`).
 - **Cron laporan 15-menit: scope HARUS dinamis, berhenti hanya bila 0 kartu aktif (VO2D, 13 Okt):** prompt lama "self-delete saat R1–R4 done" menghapus cron saat kartu lanjutan R5 masih ada → monitoring mati beberapa jam, blokir `needs_input` duduk 106 menit tanpa terdeteksi. Benar: derive tracked set dari query dinamis (`SELECT ... WHERE title LIKE 'VO2D-R%'`) supaya kartu baru otomatis ke-track; berhenti hanya bila query dinamis itu menghasilkan NOL baris non-done. Script status juga harus DINAMIS mengikuti board, bukan hardcode daftar kartu — kartu R5+ tidak akan terpantau oleh script hardcode R1–R4.
 - **Laporan cron no-agent harus berdasarkan status aktual dan tidak menggantikan final QA:** pastikan parser menangani status kanban yang nyata (termasuk `done`), jangan infer DONE dari kata di output bebas; setelah kartu selesai, verifikasi file dan URL secara langsung, hapus seluruh job terkait, lalu cek ulang daftar cron. `--repeat` terbatas bisa habis atau job bisa sudah tidak tercantum, jadi audit nama semua job proyek, bukan hanya menghapus ID yang diingat.
@@ -283,8 +292,8 @@ on its next spawn (requeue); for the current run, prove usage via state.db.
   `ANTHROPIC_BASE_URL`; dua key di host sama = rotasi mulus, BUKAN jendela kuota
   terpisah.
 - **Pool probe per entry (bukti 4-Oct):** uji tiap entry pool (`access_token` atau env-seeded `.env`) dengan `urllib` lokal (token dalam variabel shell, tidak dicetak) → lapor per-ID fingerprint (tanpa mencetak rahasia). Kunci `provider-fallback` 200 tapi `.env` baru 429 → pool sehat tapi rotasi belum terbukti; catat di komentar kartu. Jangan klaim "fallback sudah jalan normal" hanya dari satu entry sehat.
-- **Key yang dipaste di chat = kompromi (4-Oct, semua profile):** cabut per profile (`hermes auth remove anthropic <id>` per profile — `program-developer`, `code-analyst`, `harry`, `codi`), regenerasi di provider proxy, `auth add` kembali. Kunci tidak boleh tercetak di chat/file; hanya fingerprint lokal atau label.
-- **`needs_input` otorisasi (UI/UX, 4-Oct):** format izin eksplisit menyebutkan path edit (`~/projects/<project>`), batasan (`frontend/`, M6 token, axe 0, reduced-motion), dan penegasan final. Terbukti berhasil: unblock + izin → run 119 heartbeat berlanjut. Ini kebijakan, bukan error.
+- **Key yang dipaste di chat = kompromi (4-Oct, semua profile):** cabut per profile (`hermes auth remove anthropic <id>` per profile — `program-developer`, `code-analyst`, `planner`, `koordinator`), regenerasi di Provider, `auth add` kembali. Kunci tidak boleh tercetak di chat/file; hanya fingerprint lokal atau label.
+- **`needs_input` otorisasi (UI/UX, 4-Oct):** format izin eksplisit menyebutkan path edit (`~/projects/AutoClipper`), batasan (`frontend/`, M6 token, axe 0, reduced-motion), dan penegasan final. Terbukti berhasil: unblock + izin → run 119 heartbeat berlanjut. Ini kebijakan, bukan error.
 - **Watchdog cron per jam (`no_agent`, script):** stdout KOSONG saat sehat
   (anti-spam), ladder otomatis untuk blocked-429, JANGAN sentuh `needs_input`,
   umumkan sinyal RAMPUNG saat semua kartu done, **pause job saat workstream

@@ -68,7 +68,7 @@
     },
     {
       "name": "ci-cd-and-automation",
-      "description": "Automates CI/CD pipeline setup. Use when setting up or modifying build and deployment pipelines. Use when you need to automate quality gates, configure test runners in CI, or establish deployment strategies.",
+      "description": "Automates CI/CD pipeline setup. Use when setting up or modifying build and deployment pipelines. Use when you need to automate quality gates, configure test run",
       "license": "MIT",
       "source": "https://github.com/addyosmani/agent-skills (MIT)"
     },
@@ -86,7 +86,7 @@
     },
     {
       "name": "codi-team-dispatch",
-      "description": "Use when assigning work to another Hermes profile/worker.",
+      "description": "'Use when assigning work to another Hermes profile/worker.'",
       "license": "MIT",
       "source": "declared MIT in skill file (office authored)"
     },
@@ -248,7 +248,7 @@
     },
     {
       "name": "large-project-gated-delivery",
-      "description": "Use when coordinating a large multi-milestone gated project.",
+      "description": "'Use when coordinating a large multi-milestone gated project.'",
       "license": "MIT",
       "source": "declared MIT in skill file (office authored)"
     },
@@ -290,7 +290,7 @@
     },
     {
       "name": "meta-social-publishing",
-      "description": "Use when automating Threads or Facebook Page posts via API.",
+      "description": "'Use when automating Threads or Facebook Page posts via API.'",
       "license": "MIT",
       "source": "declared MIT in skill file (office authored)"
     },
@@ -410,7 +410,7 @@
     },
     {
       "name": "scheduled-report-delivery",
-      "description": "Use when a scheduled report must hit its Drive deadline.",
+      "description": "'Use when a scheduled report must hit its Drive deadline.'",
       "license": "MIT",
       "source": "declared MIT in skill file (office authored)"
     },
@@ -500,13 +500,13 @@
     },
     {
       "name": "task-observer",
-      "description": "Monitors task execution for skill improvement opportunities: logs patterns, user corrections and methodology worth preserving to the workspace, turns them into skill updates in a weekly review, and flags repeating work as new skills. Use during ANY multi-step task, agentic workflow, or work session. Also triggers in post-task feedback discussions and when the user mentions skill observations, the observation log, or skill taxonomy. Also known as \\\"One Skill to Rule Them All\\\" — trigger on this phrase too. IMPORTANT: invoke this skill before the FIRST tool call of any session and before writing or proposing a plan — any turn that will involve a tool call counts. This sentence is the session-start trigger and the only activation layer that survives an unreachable config file; pair it with a CLAUDE.md instruction or a session-start hook (references/environments.md). A subagent dispatched by a session already running it does not run it: it writes nothing and puts its findings in its report.",
+      "description": "Monitors task execution for skill improvement opportunities: logs patterns, user corrections and methodology worth preserving to the workspace, turns them into ",
       "license": "CC-BY-4.0",
       "source": "CC-BY-4.0 (upstream LICENSE retained in skill folder)"
     },
     {
       "name": "task-progress-reporting",
-      "description": "Report dispatched worker tasks to the user automatically.",
+      "description": "'Report dispatched worker tasks to the user automatically.'",
       "license": "MIT",
       "source": "declared MIT in skill file (office authored)"
     },
@@ -518,7 +518,7 @@
     },
     {
       "name": "ui-ux-pro-max",
-      "description": "UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typography, color, charts, and stack-specific UI implementation. Searchable local data: 79 searchable styles (50 active), 192 product palettes and reasoning profiles, 74 font pairings, 119 UX guidelines, 105 icons, 17 GSAP presets, 25 chart types, and 22 stacks.",
+      "description": "UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, co",
       "license": "MIT",
       "source": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill (MIT root LICENSE retained)"
     },

@@ -2,7 +2,7 @@
 name: hermes-stream-stale-diagnosis
 description: "Use when Hermes reports stale provider streams or timeouts."
 version: 1.0.0
-author: office
+author: Developer (program-developer)
 license: MIT
 metadata:
   hermes:
@@ -22,7 +22,7 @@ Load this when Hermes reports `Stream stale for Ns`, `No response from provider 
 
 - Inspect per-profile request dumps (`sessions/request_dump_*.json`), not just gateway logs.
   Dumps can identify independent `rate_limit_error` / HTTP 429 failures.
-- A measured coordinator request was 1,709,991 bytes with 1,121 messages. Replaying it against the
+- A measured Koordinator request was 1,709,991 bytes with 1,121 messages. Replaying it against the
   configured endpoint returned SSE `message_start` after 37.7s. An explicit 120s timeout can
   override Hermes' context-aware default for large prompts; resolve the effective timeout with
   `hermes_cli.timeouts.get_provider_stale_timeout`, not by reading YAML alone.

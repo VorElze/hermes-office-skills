@@ -2,7 +2,7 @@
 name: task-progress-reporting
 description: 'Report dispatched worker tasks to the user automatically.'
 version: 1.0.0
-author: codi
+author: koordinator
 license: MIT
 platforms: [linux]
 metadata:
@@ -33,18 +33,9 @@ so; report a measured stall and the corrective action. The owner explicitly
 prefers coordinator-authored, real-time reports over raw status-only monitor
 output.
 
-When replacing a raw monitor with a recurring agent report, pause the old job,
-create the new job using the exact supported schedule syntax, then
-verify the job name, enabled state, next-run timestamp, delivery destination,
-and prompt containing the full reporting contract (cron runs without chat
-history). Never claim recurring reports are active based only on command exit
-status; read the job list. Keep any independent no-agent recovery watchdog
-separate from the narrative report job. Before promising 15-minute progress,
-verify the job's first actual delivery and inspect its text; an enabled
-schedule or a successful create response proves only configuration, not that
-the user received a useful report. On an explicit "mana laporanmu?" ask, send
-a measured on-demand status NOW — do not defer the answer to the next tick —
-and keep the recurring monitor running separately. When the owner quotes an
+When the user requests a fixed reporting cadence, use an agent report job that emits concise, evidence-based updates at that cadence; do not substitute a change-gated job that may stay silent during a quiet verification phase. Set a bounded lifetime only when it actually covers the agreed work window, and verify completion cleanup rather than assuming the prompt can stop its own recurring schedule. A cron prompt can request self-pause, but treat that as an intention until the job is actually disabled and verify its state after the completion report. If a reporting job cannot observe live Kanban/repo state or cannot reliably stop on completion, say so and use a supported, verified mechanism instead of promising automatic progress reports.
+
+**When the whole tick is derivable from the board DB, ship it as a `no_agent` script job, not an agent job.** Keep the agent report job for ticks that need judgment (verdict wording, recommendations, interpreting an anomaly); a card-status cadence (statuses, idle minutes, percentage, deadline) is pure computation: `hermes cron create "15m" --name '<nama>' --deliver origin --script <file>.py --no-agent` (script filename bare, resolved inside the profile's `scripts/` dir). Have it open the board DB read-only (`sqlite3.connect('file:<board.db>?mode=ro', uri=True)`) and the worker profile's `state.db` for the `↳ diam Nm · <tool terakhir>` line. **Make the stop condition mechanical, never a prompt promise:** the script stores its own job id in a sibling file and, when every watched card is terminal, prints the closing summary then runs `hermes cron disable <job_id>` itself. Prove the chain with one manual fire (`hermes cron run <id>` → `Ran now: succeeded`) plus the text that actually landed, and delete the superseded report job of the finished phase in the same pass — a stale `done` job keeps the owner waiting for reports that describe old work. When the owner quotes an
 earlier cron report back, treat that text as history, not evidence: re-read the
 board in the same turn before repeating any of its claims — a tick that said
 "running" minutes earlier can already be a parked review lane whose respawn
@@ -69,11 +60,27 @@ solutif (problem + remediation in the same message), detail tapi ringkas. For a 
 When something is wrong, state it immediately WITH its fix/next step; never
 wait for the user to ask. Quote only numbers present in evidence; label unverified claims as unverified.
 
-When a parent/root task is `done` but a deploy/preflight child remains `blocked`, report the two scopes separately: implementation/package completion is not live release completion. Include the blocked card's current recorded reason and exact remaining gate; do not imply that local QA, ZIP creation, or a successful preview resolves deployment blockers.
+**After answering the owner's status question, stop unless new evidence or an actionable anomaly exists.** A fresh status answer IS the deliverable; do not launch another audit, snapshot, or poll merely because project work continues in the background. Resume monitoring only on a scheduled monitor signal, a new owner request, or a verified anomaly that needs intervention — redundant checks spend requests without changing the decision.
+
+When a parent/root task is `done` but a deploy/preflight child remains `blocked`, report the two scopes separately: implementation/package completion is not live release completion. Include the blocked card's current recorded reason and exact remaining gate; do not imply that local QA, ZIP creation, or a successful preview resolves deployment blockers. A package sitting on disk and a reachable URL are different facts: quote a probe of an app-specific marker route as the proof of "live", never the ZIP's existence and never a front-page HTTP 200 (a fresh subdomain answers 200 with the hosting placeholder) — recipe in `cleo-hosting` → "Verifikasi deploy". Report the packaged-but-not-deployed state in that explicit pair, so the owner sees "paket siap / deploy belum" instead of inferring either one.
 
 For a multi-card report, include each card's measured completion estimate and the overall chain completion separately. Derive estimates from acceptance evidence/diff, not lane status or elapsed time; if only two of four cards are done and one is running, report the verified 2/4 milestone count and label any per-card estimate as not yet measurable rather than inventing precision. State what evidence is missing before calling the chain released. When the owner delegates an entire multi-step chain and asks not to be the one chasing progress, deliver the schedule and the guard TOGETHER at handoff: publish one per-step table (step, scope, budget minutes, estimated completion time) and embed the same budgets in the monitor script as thresholds — at ≥80% of a step's budget emit `NEAR_DEADLINE` (coordinator inspects the card and worker liveness immediately), over 100% emit `DEADLINE` (coordinator intervenes: nudge, or reclaim+dispatch if dead). `templates/kanban_progress_monitor.py` already carries the `BUDGET` dict, the flags, and the `milestones done: N/M` fixed-denominator line — fill them in rather than re-deriving. The escalation then fires on its own at the moment you promised it would, without the owner asking or the coordinator being awake in-session.
 
 **Every tick and every on-demand status answer carries a per-card percentage** — the owner explicitly requests a progress percentage and 15-minute updates during active work. But a % is an ESTIMATE: derive it from evidence (diff of the worker's workspace vs baseline, milestone acceptance criteria, completed/total milestones), never from a worker's self-report or elapsed runtime. State the evidence basis and what remains; distinguish card completion from end-to-end delivery (QA, packaging, upload). Never invent precise percentages such as 90% from a RUNNING status alone. Changed-file count, byte growth, or a new hash proves only ACTIVITY, never completion: a source file growing from 45KB to 51KB means edits happened, not that any acceptance criterion passes — never translate file-level activity into a completion % or a "component finished" claim; map the actual diff to acceptance criteria first, and report activity as activity when the mapping cannot be made. A screenshot likewise proves only what its framing shows: an overview/top-down shot cannot establish desk-level detail (whether a pose is actually sitting, whether a screen is emissive), so it does NOT count as visual-acceptance evidence — require a close-up at the relevant angle before crediting that milestone, and describe a wide shot only as "scene renders" evidence. If evidence cannot support a meaningful percentage, say "belum bisa diukur" and give the verified milestone counts.
+
+**Card WEIGHTS with only one absolute budget: calibrate the multiplier once, reuse it everywhere.** A plan that assigns relative weights (1,5 / 2 / 3 / 4) and states a single absolute budget (a 1,5-weight card = 90 minutes) has fixed the unit at 60 minutes per weight — do not invent per-card minutes afterwards. Then chain budget = `Σ weights × unit`, deadline = sprint start + that total, and progress = `(Σ done weights + 0,5 × Σ running weights) / Σ weights`, printed with the label "berbobot kartu" so the owner can recompute it. When the plan carries no owner-set date, say the deadline is derived from budget and invite the owner to pin a real one; never let an internal projection be read as a contracted deadline.
+
+**Kalau kartunya sendiri sudah menulis budget, ITU denominatornya — jangan mengarang bobot.** Baca `Budget: N menit`
+dari body kartu (`SELECT body FROM tasks`) sebelum menghitung apa pun; bobot relatif yang Anda karang sendiri
+(1,5 / 3,0 / 2,0 dst.) menghasilkan deadline yang tidak bisa direkonsiliasi owner dengan kartu yang ia lihat, dan
+angka itu harus ditarik kembali di laporan berikutnya. Deadline = waktu kartu pertama mulai + Σ budget kartu, dan
+basis hitungannya dicetak satu baris ("16 jam = jumlah budget R0–R6"). Kalau body kartu tidak memuat budget,
+nyatakan deadline tidak terukur alih-alih meminjam angka dari proyek lain.
+
+**Laporan 15 menit + driver otomatis = dua job berbeda.** Driver background membuka kartu; job `--no-agent`
+melapor. Jangan pernah memberi job laporan kewenangan `unblock`/`dispatch`, dan jangan menghentikan driver saat
+laporan dibuat. Saat fase berganti, hapus job laporan lama pada pass yang sama dengan pembuatan job baru
+(pemilik menyebutnya "hapus response lama yang sudah done"), lalu buktikan job baru dengan satu fire manual.
 
 **Fix the denominator at dispatch, never over "visible" cards.** Board UIs and naive queries count only non-terminal cards, but children AUTO-ARCHIVE the moment the parent/root closes — so a percentage computed over active cards collapses from 50% to 0% *while all the work is actually done*, and the owner reads it as a regression ("kenapa 0% lagi"). Capture the milestone card-id list once at dispatch and compute every later percentage as `done_or_archived / that fixed list`; when the list is fully terminal, report "selesai" outright instead of a percentage, and say which cards were archived.
 
@@ -95,8 +102,20 @@ reflect a live check from that session, never carried-over status.
 **Interpret every board lane for the owner.** The owner reads the Kanban UI
 alongside the report and asks "kenapa masih ada yang blocked — sampah?" A
 status line that names `blocked` without its reason reads as a stuck project.
-For each non-running card state WHY it waits (dependency-wait = antre otomatis
-buka sendiri saat induk done; needs_input = menunggu keputusan) and mention
+For each non-running card state WHY it waits: a card held by dependency alone
+opens itself when every parent is `done`, but a card in `blocked` is a MANUAL
+hold and never releases on its own — resolving its fix card leaves it blocked
+until `hermes kanban unblock` is called with the measured evidence, so "fix
+sudah selesai" and "gate jalan lagi" are two different facts. A `blocked` row
+whose parents are all `done` for more than ~10 minutes is an orphaned block,
+not progress. When the DB says zero blocked cards but the owner still sees a
+badge, check `tasks.block_kind`: it keeps its old value (`needs_input`,
+`capability`) after the card moves on, so any view reading that column paints a
+healthy `running` card as blocked — clear it for non-blocked rows before
+answering, and quote the DB count you just measured. `needs_input` should also
+name whose decision it is: a skill demanding a configuration choice (e.g. a
+lint/design skill's mode) is the coordinator's ruling, not an owner
+escalation. Also name the
 superseded cards you archived, so the visible board and the report agree. A
 blocked lane the reports never explain becomes a trust question, not a status
 question. Extend the same reading to silence: a `done` card whose worker sends
@@ -139,7 +158,12 @@ runtime cap and a stated clock basis. If the task is requeued, report both
 cumulative active run time (sum of run intervals where available) and wall-clock
 elapsed, or say active budget usage cannot be measured. A past ETA must be
 explicitly retracted, not replaced by a new precise estimate from heartbeat or
-file mtimes.
+file mtimes. When a card has blown its budget, name WHERE the minutes went
+before defending the current run: crashed runs (exit without
+`kanban_complete`), `blocked` waits, and rejected gate rounds consume budget
+without producing output, so "211 menit untuk anggaran 60 menit" is usually
+3 sub-runs and one wasted block, not one slow worker. Report the active run's
+consumption separately from the card total and say which part was wasted.
 
 **When the owner asks you not to forget a named cron report, verify the exact job rather than making a vague promise.** Match its job ID/name in `cronjob_manage action='list'`, confirm it is enabled and scheduled, then inspect the newest execution's completion and delivery outcome (or the latest report artifact). Explain that the cron itself delivers reports automatically; do not imply you can independently remember or manually relay future outputs unless the system confirms delivery to this conversation. If the latest execution is still running, state that precisely and cite the newest completed/delivered report time; never present a prior report as the current tick. Continue with the existing end-to-end reporting-chain verification below.
 
@@ -170,6 +194,30 @@ next step). If the promised content exceeds the monitor's knowledge, send it
 yourself as a labeled message at the deadline and let the routine ticker
 continue underneath; give generic snapshots a label ("status mentah — laporan
 keputusan menyusul") so a thin tick is never read as the promised update.
+
+**A report must say what the worker is DOING, not only what state it is in.**
+Status + minutes + a gate count reads to the owner as "tidak ada laporan
+pekerjaan" even when every tick fires and lands delivered — he cannot tell a
+productive 55-minute run from a hung one. Add one line per `running` card:
+`↳ diam <N>m · <tool/aksi terakhir>`, built from the worker profile's
+`state.db` (age of `max(messages.timestamp)` for idle, plus the newest
+`role='tool'` row's `tool_name` and first ~90 chars of `content`). That single
+line converts a status tick into a work report and costs no extra worker
+request. Do not substitute the card's `heartbeat` for it — heartbeat proves the
+process lives, never that work advances.
+
+**Prove cron delivery with an explicit chat target and a gateway log line, not
+with a `succeeded` status or a `deliveries` row.** A job created from the CLI
+with `--deliver origin` can carry no stored chat binding: sends then fall back
+through `send_path_degraded` while the job still records `succeeded`, and the
+owner reports "laporan tidak sampai". Re-set the target explicitly
+(`hermes cron edit <id> --deliver telegram:<chat_id>`, format
+`platform:chat_id`) and accept proof only from a `delivered ...
+message_id=<n>` line for that chat id in the profile gateway log. The
+`cron/deliveries.db` ledger is a receipt, not the text: it can hold the whole
+history at `length(content)=0` with `job_json={}` while messages genuinely
+arrived, so reading it as evidence yields a false "everything failed" — and
+`status='delivered'` alone never proves a readable body reached the chat.
 
 ## Owner notification: kanban notify-subscribe (so the owner never has to ask)
 
@@ -235,7 +283,7 @@ lines in `gateway.log` proves nothing either way; the ping cursor is the proof.
 
 ### Pre-development design delegation
 
-For a design-only project, split content architecture/positioning from visual direction/assets when the scopes are distinct, and link the visual card as dependent on the content brief. Put the same project context and acceptance criteria in each card (workers do not share sibling context), specify explicitly that the deliverable is a design specification rather than code, and preserve the real reference assets in a path accessible to the assigned profiles. Before dispatch, verify each assignee can read the referenced files; if not, attach/embed the essential reference content in the card brief rather than reporting it as supplied. Give each card an evidence-shaped output path or final comment requirement, a bounded runtime estimate, and owner notification subscription; after dispatch, verify actual card status/run rather than treating dispatch exit 0 as proof of execution. Report progress only from live evidence, distinguish “running” from substantive deliverable progress, and state when inputs remain unverified. Ask for confirmation before specifying consequential flows whose requirements are ambiguous (e.g. RSVP versus paid registration/QRIS).
+For a design-only project, split content architecture/positioning from visual direction/assets when the scopes are distinct, and link the visual card as dependent on the content brief. Put the same project context and acceptance criteria in each card (workers do not share sibling context), specify explicitly that the deliverable is a design specification rather than code, and preserve the real reference assets in a path accessible to the assigned profiles. Before dispatch, verify each assignee can read the referenced files; if not, attach/embed the essential reference content in the card brief rather than reporting it as supplied. Give each card an evidence-shaped output path or final comment requirement, a bounded runtime estimate, and owner notification subscription; after dispatch, verify actual card status/run rather than treating dispatch exit 0 as proof of execution. Report progress only from live evidence, distinguish “running” from substantive deliverable progress, and state when inputs remain unverified. For an owner's “is this real progress?” audit, follow `references/artifact-progress-audit.md`: verify live board state, current-run artifacts, representative behavior, acceptance mapping, and formal gate separately; never reconstruct counts or verdicts from missing/demoted tool output. Ask for confirmation before specifying consequential flows whose requirements are ambiguous (e.g. RSVP versus paid registration/QRIS).
 
 0. **Plan the report lifecycle at dispatch, before giving the owner an ETA.** Create or update the persistent monitor script + self-contained cron prompt right when cards are created — never a bare "update coming in 15 minutes" promise backed by nothing. Set a bounded lifetime or completion cleanup, and immediately verify `enabled`, `next_run_at`, `deliver`, and the watched card IDs. A future `next_run_at` is not a delivered report: inspect the first run's output text and delivery evidence, then fix schedule/script/prompt if it failed. The user asking for the promised update is a failure signal — answer with a measured on-demand report in the same turn.
 
@@ -446,9 +494,8 @@ For a design-only project, split content architecture/positioning from visual di
   <id> --kind <transient> '<takeover notice: who is editing now, why, and do
   not dispatch>'`, and implement in that same pass. The block is the point:
   it stops the dispatcher respawning a run onto files you are editing, and a
-  silent two-writer diff loses work with no error anywhere. Hold the block
-  Hold the block until your own verification passes, then release it as the record of that outcome. Two hardening steps, because the block is not self-proving: (a) re-read the target file immediately BEFORE each patch — a concurrent run may have rewritten it since your last read, and a patch against stale content duplicates functions and breaks comment openers; (b) after any concurrent-edit window run a syntax check plus a duplicate-symbol grep (`node --check`, count of `function <name>` occurrences) — a two-writer merge corrupts silently with no error surfaced anywhere. Confirm the worker is gone with `ps` AFTER one dispatcher tick: a respawn appearing minutes later means the hold did not stick — kill it again before touching the files.
-  outcome. (`reclaim+dispatch` is the rung BELOW this — right only before the
+  silent two-writer diff loses work with no error anywhere. Hold the block until your own verification passes, then release it as the record of that outcome. Two hardening steps, because the block is not self-proving: (a) re-read the target file immediately BEFORE each patch — a concurrent run may have rewritten it since your last read, and a patch against stale content duplicates functions and breaks comment openers; (b) after any concurrent-edit window run a syntax check plus a duplicate-symbol grep (`node --check`, count of `function <name>` occurrences) — a two-writer merge corrupts silently with no error surfaced anywhere. Confirm the worker is gone with `ps` AFTER one dispatcher tick: a respawn appearing minutes later means the hold did not stick — kill it again before touching the files.
+  (`reclaim+dispatch` is the rung BELOW this — right only before the
   deadline, when one more cycle can still deliver.)
 - **Don't claim efficiency as a guarantee.** "No blockage / fully automatic"
   is unverified until a transition has actually fired in front of you; report
@@ -534,7 +581,7 @@ board, use Python `sqlite3.connect('<uri>?mode=ro', uri=True, timeout=5)`;
 the sqlite3 CLI has no `-timeout` flag (its busy timeout is the `.timeout`
 dot-command), and a raw read against a live board can throw `database is
 locked` mid-script.
-- **Match the gate to the user's reporting contract
+- **Match the gate mechanism to the user's reporting contract: never hand a
   change-gated monitor to a user who asked for a fixed cadence.** Standing
   rule for this user: a report every 15 minutes DURING active work, plus an
   immediate handoff at each stage completion. Output with only status/comment
@@ -590,8 +637,8 @@ locked` mid-script.
   anomaly. A single ALL-DONE sentinel line (board has zero non-done cards) is
   compatible with that silence: print it only in that state, so the watchdog
   doubles as the "workstream finished" trigger without a second job. Do not add
-  in watchdog output.
-  - **Percentages must have one explicit denominator across every report.** Before answering “tadi X%?”, grep the archived reports for the milestone (`grep -rn '<milestone>' ~/.hermes/profiles/<profile>/cron/output/<job_id>/*.md`), then re-measure current workspace + acceptance evidence in the SAME turn. Keep separate fields for (a) per-card estimate and (b) whole-project milestone completion; never reuse the same percentage for different denominators. Derive per-card progress from weighted acceptance criteria with a fixed denominator (e.g. 1 of 4 AC verified = 25% AC coverage, not an unsupported 35% code-completion claim); code volume/diff size proves activity, not proportional completion. Count a criterion only with its test/result evidence, not a worker's self-report. If past reports conflict, acknowledge which number had the wrong scope or stale snapshot, explain the basis, and correct it without defending it. Re-run the worktree diff and latest GREEN comments immediately before quoting any percentage; a snapshot from minutes earlier may predate new edits. **Scope-qualify a milestone percentage at the moment you write it**: when code is complete but the review gate is not, write the full phrase ("M4: 100% kode, review belum final") rather than a bare "M4 100%" — the owner later cross-checks earlier reports ("bukankah tadi M4 sudah 100%?"), and a bare number whose scope was stated only in your head reads as a contradiction or a walk-back even when both reports were accurate.
+  anything else to watchdog output.
+  - **Percentages must have one explicit denominator across every report.** Before answering “tadi X%?”, grep the archived reports for the milestone (`grep -rn '<milestone>' ~/.hermes/profiles/koordinator/cron/output/<job_id>/*.md`), then re-measure current workspace + acceptance evidence in the SAME turn. Keep separate fields for (a) per-card estimate and (b) whole-project milestone completion; never reuse the same percentage for different denominators. Derive per-card progress from weighted acceptance criteria with a fixed denominator (e.g. 1 of 4 AC verified = 25% AC coverage, not an unsupported 35% code-completion claim); code volume/diff size proves activity, not proportional completion. Count a criterion only with its test/result evidence, not a worker's self-report. If past reports conflict, acknowledge which number had the wrong scope or stale snapshot, explain the basis, and correct it without defending it. Re-run the worktree diff and latest GREEN comments immediately before quoting any percentage; a snapshot from minutes earlier may predate new edits. **Scope-qualify a milestone percentage at the moment you write it**: when code is complete but the review gate is not, write the full phrase ("M4: 100% kode, review belum final") rather than a bare "M4 100%" — the owner later cross-checks earlier reports ("bukankah tadi M4 sudah 100%?"), and a bare number whose scope was stated only in your head reads as a contradiction or a walk-back even when both reports were accurate.
 - **A card status in an owner-supplied screenshot is HISTORY — reconcile it with
   the DB in the SAME turn and name the discrepancy.** The owner posts their own
   Kanban UI capture as the question's premise; if you answer from the DB without
@@ -609,6 +656,22 @@ locked` mid-script.
   latest comment before quoting any error field; a stale error plus `running`
   current run = recovered, report the recovery, not the old error.
 - **A `done` card's self-reported gates are a claim, not proof the gates ran at THAT commit.** Workers may run gates mid-session and commit afterward, or quote numbers from an earlier state, so a "5/5 gerbang lulus" comment can describe code that never got built. Before merging or calling a milestone green: (1) grep the worker log for the gate commands (`typecheck|vitest|build`) and compare their timestamps against the final commit time; (2) re-run the cheap gates yourself at HEAD — forbidden-dep grep + typecheck + targeted tests take seconds; full build only after those pass. Run each gate as its own command capturing each exit code: a `set -e` verification script dies at the first non-zero gate while its partial output still reads like a full pass, so the later gates silently never ran. Gates never run at the commit = reject the handoff, do not merge.
+- **Reconcile a gate's headline count arithmetically before accepting APPROVE.**
+  A gate file can quote a total that no single artifact produced, because
+  workers re-cut the denominator between probe rounds (one round counted 91
+  page-config cells, the next 169 combos, and the headline jumped 11x with the
+  same "0 failures"). Recompute from the JSON yourself: sum `checked` per probe,
+  subtract only the rows the report explicitly excludes (inventory/control
+  collections), and require the arithmetic to land EXACTLY on the quoted figure
+  (`12.025 + 12.064 + 4.849 − 464 = 28.938`). Treat boolean flags the same way:
+  a `*_pass: false` field is often a summariser key that was never populated,
+  so open the rows it summarises and test the real threshold (780 borderline
+  rows, min 4,67 vs floor 4,5 = no failure) before reporting a FAIL. Read
+  artifacts from the worker profile's `cache/scratch/<task>/`, not the repo or
+  `/tmp`: those copies can be an older round carrying a different denominator.
+  File sizes, diff stat and tool-call histograms prove the worker WORKED; only
+  this reconciliation proves the verdict is backed. Recipe:
+  `references/gate-claim-reconciliation.md`.
 - **A REVISE verdict returns the SAME card to `ready`, and reclaim deadlines must honor `max_runtime_seconds`.** Remediation cycle: reset the card in place (`status='ready'`, clear `last_failure_error`/`consecutive_failures`/`completed_at`/`worker_pid`/`current_run_id`), comment the verdict as fix instructions, then `dispatch` — this preserves the worktree, branch, and prior commit and avoids a duplicate card for the fix round. A kick/watchdog script with a hard-coded fallback deadline silently reclaims long cards every cycle (measured: one card cut every ~47 min, losing in-flight context each time); budget reclaim at card `max_runtime − 300 s`, using the fallback only for cards that declare no runtime.
 - **Never let a watchdog label a transient probe failure as `auth-error`.** The
     owner reads every watchdog line as a broken worker, so one timed-out probe
@@ -656,7 +719,7 @@ locked` mid-script.
 - **Never edit `jobs.json` directly to resume or rename a job.** The gateway holds `next_run_at` in memory, so a hand-edited job can sit `enabled: true` while its `next_run_at` is stuck in the past: overdue for hours, never firing, and CLI `pause`/`resume` do NOT recalculate the schedule. Proven repair: force a schedule rewrite through the CLI (`hermes cron edit <id> --schedule "every Nm"`, or remove + recreate), then verify `Next run` is in the FUTURE from `hermes -p <profile> cron list`, then fire once (`hermes cron run <id>`) and read the completion before claiming delivery. Always re-read `Next run` after any job mutation; `enabled: true` alone proves nothing about firing.
 
 - **Cron jobs VANISH from the active store after a gateway restart — re-verify the list, don't trust yesterday's inventory.** Observed: monitor + watchdog scripts still on disk and working when run by hand, but their job records absent from `hermes cron list` AND from every `jobs.json` (profile store `~/.hermes/profiles/<p>/cron/jobs.json`, global/default `~/.hermes/cron/jobs.json`) — the schedule silently stops firing. After any restart, re-list and re-create missing jobs; a script that runs fine manually proves nothing about its schedule. `hermes cron show` does NOT exist (only init/boards/create/list/ls/edit/remove/pause/resume/run) — inspect state with `cronjob_manage action='list'` or read the stores directly. The `hermes cron list` CLI renders the PROFILE store, so a job you created from another profile is invisible there.
-- **Wave-scoped card titles make percentage reporting survive the next round.** Prefix every card with its wave (`<PROYEK>-R3/FIX-A: ...`) and have the monitor derive the active wave with a regex (`<PROYEK>-R(\d+)` → `max(waves)`), then compute the percentage over THAT wave's cards only. Otherwise a finished wave's 20 done cards inflate the new wave to ~85% before any work starts. Two denominators, two lists: filter `done`/`archived` out of what the report PRINTS (the owner wants only live work) but compute the percentage from the UNFILTERED list (otherwise the % collapses to 0% exactly when the round finishes — the same artifact as the auto-archive rule above).
+- **Wave-scoped card titles make percentage reporting survive the next round.** Prefix every card with its wave (`ContohProyek-R3/FIX-A: ...`) and have the monitor derive the active wave with a regex (`ContohProyek-R(\d+)` → `max(waves)`), then compute the percentage over THAT wave's cards only. Otherwise a finished wave's 20 done cards inflate the new wave to ~85% before any work starts. Two denominators, two lists: filter `done`/`archived` out of what the report PRINTS (the owner wants only live work) but compute the percentage from the UNFILTERED list (otherwise the % collapses to 0% exactly when the round finishes — the same artifact as the auto-archive rule above).
 - **Extract the worker's own progress number from its comments, not from elapsed time.** Have each card's body require comments in the exact form `Progres NN% — <apa yang selesai>` (the worker posts them per phase), then the monitor regexes the newest comment for `Progres\s+(\d+)%`. This gives a real per-card % with a fixed denominator and zero extra requests; fall back to budget-consumed only when no progress comment exists yet. Label the two sources differently (`kerja=NN%` vs the budget line) so a budget-derived guess is never read as measured work.
 - **`hermes kanban comment` takes the body as a POSITIONAL argument — `--body` does not exist and silently falls through to the top-level `hermes` usage text.** Correct form: `hermes kanban --board <b> comment <task_id> "<text>" --author <profile>`. Anything that prints the general `usage: hermes [...]` banner means your flag was wrong, not that the comment failed.
 - **Skills are set at CREATE time (`--skill <name>`, repeatable); `hermes kanban edit` cannot change them.** For an already-created card that must run the design gate, post the skill list + gate invocation steps as a card COMMENT (workers read their thread before acting) instead of recreating the card and losing its parent chain.

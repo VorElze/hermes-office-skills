@@ -2,7 +2,7 @@
 name: meta-social-publishing
 description: 'Use when automating Threads or Facebook Page posts via API.'
 version: 1.0.0
-author: amanda
+author: koordinator
 license: MIT
 platforms: [linux]
 metadata:
@@ -137,7 +137,8 @@ Business Verification + App Review. Recipes: `references/token-lifecycles.md`.
   "reconnect required", never retryable.
 
 ### 7. Schedule + hand off content
-Coordinator stores tokens server-side; the content worker (social-media) delivers caption + calendar batches; a coordinator-run script or cron
+Coordinator stores tokens server-side; the content worker (social-media /
+Laras) delivers caption + calendar batches; a coordinator-run script or cron
 performs publishes and reports post IDs.
 - **Slot timing first, calendar second:** research platform + locale timing
   before fixing the calendar — decision recipe in
@@ -151,7 +152,7 @@ performs publishes and reports post IDs.
   publish → permalink read-back, appending the permalink to a log the
   coordinator reads when reporting.
 - For selling campaigns: **hard-sell captions and product pamphlets originate
-  from the marketing specialist**; the social specialist adapts them to channel + slot. Chain the
+  from marketing (Rendra)**; Laras adapts them to channel + slot. Chain the
 cards marketing → social-media and verify deliverable paths exist before
   reporting.
 

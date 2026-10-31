@@ -1,5 +1,4 @@
 ---
-license: MIT
 name: ponytail-debt
 description: >
   List every `shortcut:` comment (and older `ponytail:` ones) as a debt ledger. One-shot report,

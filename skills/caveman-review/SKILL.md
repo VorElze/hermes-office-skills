@@ -1,5 +1,4 @@
 ---
-license: Apache-2.0
 name: caveman-review
 description: >
   Compressed code review - one line per finding with location, problem and fix.

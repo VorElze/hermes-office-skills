@@ -2,7 +2,7 @@
 name: organization-site-menu-research
 description: Assess organization-site navigation labels with evidence.
 version: 0.1.0
-author: office
+author: Mave, Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
 metadata:

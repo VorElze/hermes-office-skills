@@ -1,7 +1,7 @@
 {
   "repository": "hermes-office-skills",
   "description": "Reusable, platform-neutral agent skills for AI-assisted offices and teams.",
-  "skill_count": 86,
+  "skill_count": 87,
   "third_party": "Only skills with verified upstream license terms are included; see NOTICE.md.",
   "held_back": [
     "absensi-report",
@@ -527,6 +527,12 @@
       "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
       "license": "MIT",
       "source": "https://github.com/obra/superpowers (MIT)"
+    },
+    {
+      "name": "web-app-delivery-playbook",
+      "description": "Use when building or deploying a web app or site.",
+      "license": "MIT",
+      "source": "declared MIT in skill file (office authored)"
     },
     {
       "name": "webapp-testing",

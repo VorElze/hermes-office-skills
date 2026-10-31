@@ -39,6 +39,14 @@ Use this when the owner explicitly asks to remove a hosted app, not merely to ta
 
 **Bound search output:** scope recursive searches to configuration directories and use `grep -RIlE` (file names only) before inspecting an exact candidate. Never print every matching line from an entire source tree; minified/vendor files can turn one match into hundreds of megabytes of output.
 
+## Hermes WebUI restart/fallback diagnosis
+
+For a screenshot showing "Hermes is restarting" or shell failed to load, use
+`hermes-gateway-web-ui` first; its symptom-specific ladder covers UI probes,
+logs, watchdog and PID race. Keep this service skill for general host/proxy
+layers. Do not infer crash-loop from one FATAL line: identify the PID holding
+the port, compare with systemd Main PID, and count restart events.
+
 ## Diagnosis ladder — NEVER blame client or server before the evidence
 
 Run in order; each step names which side it exonerates:

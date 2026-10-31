@@ -1,5 +1,4 @@
 ---
-license: MIT
 name: ponytail-audit
 description: >
   Quality audit of a whole repo: bugs, security holes, what breaks under real

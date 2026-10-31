@@ -2,7 +2,7 @@
 name: live-react-runtime-qa
 description: "Use when a live React app disagrees with tests."
 version: 0.1.0
-author: <nama pemilik>, Hermes Agent
+author: Vor Elze, Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
 metadata:

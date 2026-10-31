@@ -2,7 +2,7 @@
 name: php-upload-size-limits
 description: Use when PHP rejects uploads under the stated limit.
 version: 1.0.0
-author: office
+author: Mave
 license: MIT
 platforms: [linux]
 metadata:

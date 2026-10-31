@@ -8,7 +8,7 @@ platforms: [linux]
 metadata:
   hermes:
     tags: [qa, video, evidence, vision, ffmpeg, drive]
-    related_skills: [team-dispatch, google-workspace]
+    related_skills: [codi-team-dispatch, google-workspace]
 ---
 
 # Screen-recording QA
@@ -23,7 +23,7 @@ rencana kerja.
 ## Procedure
 
 1. **Ambil filenya.** Tautan Drive → `drive download FILE_ID --output <path>`
-   sesuai setup local google-workspace (HERMES_HOME=profiles/<profile> +
+   sesuai setup local google-workspace (HERMES_HOME=profiles/codi +
    interpreter venv instal yang punya `googleapiclient` — resolve path venv
    saat runtime, id-nya berubah tiap `pm sync`). File lokal → langsung pakai.
 2. **Probe sebelum ekstrak:**
